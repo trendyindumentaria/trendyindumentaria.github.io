@@ -613,7 +613,9 @@ const CONFIG = {
   // Mientras esté vacío se usan los productos de ejemplo de abajo.
   sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRebpf8r6xx1xze75vMvfPWE9ZJBPWxXCL1ftLltYOlZ_1yOVEn9CN7W5znIel-IAu4BtnHLvBMiZEx/pub?gid=0&single=true&output=csv",
   // Carpeta donde se suben las fotos (junto a esta página)
-  carpetaFotos: "fotos/",
+  carpetaFotos: "Fotos/",
+  // Foto grande de la portada (dentro de la carpeta de fotos). Vacío = usa fotos de prendas
+  fotoPortada: "portada.jpeg",
   envioGratisDesde: 125000,
   direccionMapa: "Rivadavia 219, Clorinda, Formosa, Argentina"
 };
@@ -768,7 +770,7 @@ function renderStatic(){
   const destacados=[...PRODUCTS.filter(p=>p.nuevo),...PRODUCTS.filter(p=>!p.nuevo)];
   const h1=PRODUCTS.find(p=>p.id==="J01")||destacados[0], h2=PRODUCTS.find(p=>p.id==="C01")||destacados[1]||destacados[0];
   if(h1)
-  $("#heroCollage").innerHTML=`<figure class="hc1"><img src="${h1.fotos[0]}" alt=""></figure><figure class="hc2"><img src="${h2.fotos[0]}" alt=""></figure><div class="hero-badge">Nuevos ingresos</div>`;
+  $("#heroCollage").innerHTML=`<figure class="hc1"><img src="${CONFIG.fotoPortada&&CONFIG.sheetCsvUrl?photoUrl(CONFIG.fotoPortada):h1.fotos[0]}" alt="Trendy"></figure><figure class="hc2"><img src="${(CONFIG.fotoPortada&&CONFIG.sheetCsvUrl?h1:h2).fotos[0]}" alt=""></figure><div class="hero-badge">Nuevos ingresos</div>`;
 
   // talles
   const allSizes=[...new Set(PRODUCTS.flatMap(p=>p.talles))];
