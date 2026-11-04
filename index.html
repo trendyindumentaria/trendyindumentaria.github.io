@@ -207,6 +207,8 @@ footer a:hover{color:#fff}
 .qty{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--white)}
 .qty button{width:40px;height:44px;font-size:1.1rem}
 .qty span{min-width:30px;text-align:center}
+.qty button.max{opacity:.3}
+#addBtn[aria-disabled="true"]{opacity:.4;cursor:not-allowed}
 .buy-row{display:flex;gap:10px;margin-bottom:14px}
 .buy-row .btn{flex:1}
 .hint{font-size:.8rem;color:#b0482f;min-height:1.2em;margin-bottom:6px}
@@ -552,7 +554,7 @@ input::placeholder{color:#9b908a;opacity:1}
       <ul class="feat" id="pFeat"></ul>
       <div class="label">Talle <span id="pSizeNote"></span></div>
       <div class="size-row" id="pSizes"></div>
-      <div class="label">Cantidad</div>
+      <div class="label">Cantidad <span id="stockNote"></span></div>
       <div class="buy-row">
         <div class="qty"><button id="qMinus" aria-label="Menos">−</button><span id="qVal">1</span><button id="qPlus" aria-label="Más">+</button></div>
         <button class="btn btn-dark" id="addBtn">Agregar al carrito</button>
@@ -641,7 +643,7 @@ const EJEMPLO = [
   {id:"C01",nombre:"Camisa Satén Champagne",categoria:"Ropa",subcategoria:"Camisas y Blusas",precio:32500,talles:"S,M",descripcion:"Camisa de satén con brillo sutil. Perfecta para eventos o una salida.",caracteristicas:"Tela: Satén; Color: Champagne; Calce: Suelto",color:"#E4CFB2",nuevo:"si"},
   {id:"C02",nombre:"Camisa Blanca Clásica",categoria:"Ropa",subcategoria:"Camisas y Blusas",precio:28900,talles:"S,M,L",descripcion:"La camisa blanca que no puede faltar. Algodón con un toque de elastano.",caracteristicas:"Tela: Poplín; Color: Blanco; Calce: Regular",color:"#F3F1EC"},
   {id:"C03",nombre:"Camisa Rayada Celeste",categoria:"Ropa",subcategoria:"Camisas y Blusas",precio:27500,talles:"M",descripcion:"Camisa a rayas finas, para un look relajado. Última unidad.",caracteristicas:"Tela: Algodón; Color: Celeste/Blanco; Calce: Oversize",color:"#B9CCDB"},
-  {id:"P01",nombre:"Pantalón Sastrero Negro",categoria:"Ropa",subcategoria:"Pantalones",precio:36900,talles:"36,38,40,42",descripcion:"Pantalón de tiro alto con pinzas y pierna ancha. Estiliza la figura.",caracteristicas:"Tela: Crepe; Color: Negro; Tiro: Alto",color:"#1F1F1F",nuevo:"si"},
+  {id:"P01",nombre:"Pantalón Sastrero Negro",categoria:"Ropa",subcategoria:"Pantalones",precio:36900,talles:"36:1,38:2,40:3,42:1",descripcion:"Pantalón de tiro alto con pinzas y pierna ancha. Estiliza la figura.",caracteristicas:"Tela: Crepe; Color: Negro; Tiro: Alto",color:"#1F1F1F",nuevo:"si"},
   {id:"P02",nombre:"Jean Wide Leg",categoria:"Ropa",subcategoria:"Pantalones",precio:39500,talles:"36,38,40",descripcion:"Jean rígido de pierna ancha y tiro alto.",caracteristicas:"Tela: Denim; Color: Azul medio; Tiro: Alto",color:"#6F88A6"},
   {id:"P03",nombre:"Pantalón Lino Beige",categoria:"Ropa",subcategoria:"Pantalones",precio:33000,talles:"S,M,L",descripcion:"Pantalón de lino con cintura elastizada, fresco para el verano.",caracteristicas:"Tela: Lino; Color: Beige; Tiro: Medio",color:"#D7C4A8"},
   {id:"S01",nombre:"Short Sastrero Crudo",categoria:"Ropa",subcategoria:"Shorts",precio:22500,talles:"S,M,L",descripcion:"Short de vestir con pinzas y bolsillos.",caracteristicas:"Tela: Gabardina; Color: Crudo; Tiro: Alto",color:"#EAE2D3",nuevo:"si"},
@@ -710,11 +712,16 @@ function normalize(list){
   const seen={};
   return list.filter(p=>String(p.nombre||"").trim()&&String(p.disponible??"si").trim().toLowerCase()!=="no").map((p,i)=>{
     let id=String(p.id||"").trim()||slug(p.nombre); if(seen[id]) id+="-"+(++seen[id]); else seen[id]=1;
-    const talles=String(p.talles||"").split(/[,|;]/).map(s=>s.trim()).filter(Boolean);
+    const stock={};
+    String(p.talles||"").split(/[,|;]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{
+      const m=s.match(/^(.+?)\s*(?::|\()\s*(\d+)\s*\)?$/); const t=(m?m[1]:s).trim(), n=m?parseInt(m[2],10):1;
+      if(t&&n>0) stock[t]=(stock[t]||0)+n;
+    });
+    const talles=Object.keys(stock);
     let fotos=String(p.fotos||"").split(/[,|;\n]/).map(s=>s.trim()).filter(Boolean).map(photoUrl);
     if(!fotos.length) fotos=[0,1,2].map(v=>fakePhoto(p.subcategoria,p.color||"#CDB79E",v));
     const caract=String(p.caracteristicas||"").split(";").map(s=>s.split(":")).filter(a=>a[0]&&a[0].trim()).map(a=>[a[0].trim(),(a.slice(1).join(":")||"").trim()]);
-    return {...p,id,nombre:String(p.nombre).trim(),categoria:String(p.categoria||"").trim(),subcategoria:String(p.subcategoria||"").trim(),precio:parsePrice(p.precio),talles,fotos,caract,nuevo:String(p.nuevo||"").trim().toLowerCase()==="si",orden:i};
+    return {...p,id,nombre:String(p.nombre).trim(),categoria:String(p.categoria||"").trim(),subcategoria:String(p.subcategoria||"").trim(),precio:parsePrice(p.precio),talles,stock,fotos,caract,nuevo:String(p.nuevo||"").trim().toLowerCase()==="si",orden:i};
   }).filter(p=>p.talles.length);
 }
 
@@ -805,7 +812,8 @@ function renderGrid(){
   $("#catTitle").textContent=state.cat==="Todos"?"Todos los productos":state.cat;
   $("#resultInfo").textContent=(state.q?`Resultados para «${state.q}» · `:"")+list.length+(list.length===1?" producto":" productos");
   $("#grid").innerHTML=list.length?list.map(p=>{
-    const last=p.talles.length===1&&p.talles[0]!=="Único"?'<span class="badge dark">Último talle</span>':p.talles[0]==="Único"?'<span class="badge dark">Prenda única</span>':p.nuevo?'<span class="badge">Nuevo</span>':"";
+    const units=Object.values(p.stock).reduce((a,n)=>a+n,0);
+    const last=p.talles[0]==="Único"&&units===1?'<span class="badge dark">Prenda única</span>':units===1?'<span class="badge dark">Última unidad</span>':p.talles.length===1?'<span class="badge dark">Último talle</span>':p.nuevo?'<span class="badge">Nuevo</span>':"";
     return `<button class="card" data-id="${esc(p.id)}">
       <div class="ph">${last}<img src="${p.fotos[0]}" alt="${esc(p.nombre)}" loading="lazy">${p.fotos[1]?`<img class="alt" src="${p.fotos[1]}" alt="" loading="lazy">`:""}<span class="quick">Ver prenda</span></div>
       <h3>${esc(p.nombre)}</h3><div class="price">${money(p.precio)}</div><div class="sizes">Talles: ${p.talles.map(esc).join(" · ")}</div>
@@ -825,11 +833,23 @@ function openProduct(id){
   $("#pFeat").style.display=cur.caract.length?"":"none";
   $("#pSizeNote").textContent=cur.talles.length===1?(cur.talles[0]==="Único"?"Talle único":"Último talle disponible"):"Elegí tu talle";
   $("#pSizes").innerHTML=cur.talles.map(t=>`<button class="size-btn${t===curSize?" on":""}" data-size="${esc(t)}">${esc(t)}</button>`).join("");
-  $("#qVal").textContent=1; $("#hint").textContent="";
+  $("#hint").textContent=""; updateQtyUI();
   $("#thumbs").innerHTML=cur.fotos.map((f,i)=>`<button data-img="${i}"><img src="${f}" alt=""></button>`).join("");
   $("#gPrev").style.display=$("#gNext").style.display=cur.fotos.length>1?"":"none";
   setImg(0); updateAsk();
   $("#modal").classList.add("on");$("#overlay").classList.add("on");document.body.style.overflow="hidden";
+}
+function enCarrito(id,size){return cart.filter(c=>c.id===id&&c.size===size).reduce((a,c)=>a+c.qty,0)}
+function disponible(p,size){return Math.max(0,(p.stock[size]||0)-enCarrito(p.id,size))}
+function updateQtyUI(){
+  const st=$("#stockNote"), add=$("#addBtn");
+  if(!curSize){curQty=1;$("#qVal").textContent=1;st.textContent="";add.removeAttribute("aria-disabled");$("#qPlus").classList.remove("max");return}
+  const total=cur.stock[curSize]||0, inCart=enCarrito(cur.id,curSize), max=disponible(cur,curSize);
+  curQty=Math.max(1,Math.min(curQty,max||1)); $("#qVal").textContent=curQty;
+  st.textContent=(total===1?"Última unidad disponible":`${total} unidades disponibles`)+(inCart?` · ya tenés ${inCart} en tu carrito`:"");
+  $("#qPlus").classList.toggle("max",curQty>=max);
+  if(max===0){add.setAttribute("aria-disabled","true");$("#hint").textContent="Ya agregaste al carrito todas las unidades disponibles de este talle."}
+  else{add.removeAttribute("aria-disabled");}
 }
 function setImg(i){
   curImg=(i+cur.fotos.length)%cur.fotos.length;
@@ -847,11 +867,17 @@ function closeAll(){
 function saveCart(){try{localStorage.setItem("trendy_cart",JSON.stringify(cart))}catch(e){}}
 function addToCart(){
   if(!curSize){$("#hint").textContent="Elegí un talle para continuar.";return}
+  const max=disponible(cur,curSize);
+  if(max<=0){$("#hint").textContent="Ya agregaste al carrito todas las unidades disponibles de este talle.";return}
+  if(curQty>max) curQty=max;
   const key=cur.id+"|"+curSize; const ex=cart.find(c=>c.key===key);
   if(ex) ex.qty+=curQty; else cart.push({key,id:cur.id,size:curSize,qty:curQty});
   saveCart();renderCart();closeAll();showAdded(cur,curSize,curQty);
 }
-function cartLines(){return cart.map(c=>({...c,p:PRODUCTS.find(p=>p.id===c.id)})).filter(c=>c.p)}
+function cartLines(){
+  // si cambió el stock en la planilla, se ajusta el carrito
+  if(PRODUCTS.length){let ch=false;cart=cart.filter(c=>{const p=PRODUCTS.find(x=>x.id===c.id);const n=p?(p.stock[c.size]||0):0;if(n<=0){ch=true;return false}if(c.qty>n){c.qty=n;ch=true}return true});if(ch)saveCart()}
+  return cart.map(c=>({...c,p:PRODUCTS.find(p=>p.id===c.id)})).filter(c=>c.p)}
 function renderCart(){
   const lines=cartLines();
   const n=lines.reduce((a,c)=>a+c.qty,0), total=lines.reduce((a,c)=>a+c.qty*c.p.precio,0);
@@ -883,7 +909,9 @@ function updateOrderLink(lines=cartLines(),total=lines.reduce((a,c)=>a+c.qty*c.p
   t+=`\n\n¡Gracias!`;
   const a=$("#sendOrder"); a.href=waLink(t); a.setAttribute("aria-disabled",lines.length?"false":"true");
 }
-function changeQty(key,d){const c=cart.find(x=>x.key===key);if(!c)return;c.qty+=d;if(c.qty<1)cart=cart.filter(x=>x!==c);saveCart();renderCart()}
+function changeQty(key,d){const c=cart.find(x=>x.key===key);if(!c)return;
+  if(d>0){const p=PRODUCTS.find(x=>x.id===c.id);const n=p?(p.stock[c.size]||0):0;if(c.qty>=n){toast(n===1?"Es la única unidad disponible de ese talle":`Solo hay ${n} unidades de ese talle`);return}}
+  c.qty+=d;if(c.qty<1)cart=cart.filter(x=>x!==c);saveCart();renderCart()}
 function openCart(){$("#drawer").classList.add("on");$("#overlay").classList.add("on");document.body.style.overflow="hidden"}
 
 function openNow(){
@@ -925,7 +953,7 @@ document.addEventListener("click",e=>{
   if(t.dataset.cat){e.preventDefault();goCat(t.dataset.cat)}
   else if(t.dataset.chip){state.cat=t.dataset.chip;renderGrid()}
   else if(t.classList.contains("card")) openProduct(t.dataset.id);
-  else if(t.dataset.size){curSize=t.dataset.size;document.querySelectorAll(".size-btn").forEach(b=>b.classList.toggle("on",b===t));$("#hint").textContent="";updateAsk()}
+  else if(t.dataset.size){curSize=t.dataset.size;document.querySelectorAll(".size-btn").forEach(b=>b.classList.toggle("on",b===t));$("#hint").textContent="";updateQtyUI();updateAsk()}
   else if(t.dataset.img) setImg(+t.dataset.img);
   else if(t.dataset.inc) changeQty(t.dataset.inc,1);
   else if(t.dataset.dec) changeQty(t.dataset.dec,-1);
@@ -936,8 +964,12 @@ document.addEventListener("click",e=>{
 });
 $("#gPrev").onclick=()=>setImg(curImg-1);
 $("#gNext").onclick=()=>setImg(curImg+1);
-$("#qMinus").onclick=()=>{curQty=Math.max(1,curQty-1);$("#qVal").textContent=curQty};
-$("#qPlus").onclick=()=>{curQty=Math.min(10,curQty+1);$("#qVal").textContent=curQty};
+$("#qMinus").onclick=()=>{curQty=Math.max(1,curQty-1);$("#hint").textContent="";updateQtyUI()};
+$("#qPlus").onclick=()=>{
+  if(!curSize){$("#hint").textContent="Elegí un talle primero.";return}
+  const max=disponible(cur,curSize);
+  if(curQty>=max){$("#hint").textContent=max===1?"Hay una sola unidad de este talle.":`Solo hay ${max} unidades disponibles de este talle.`;return}
+  curQty++;updateQtyUI()};
 $("#addBtn").onclick=addToCart;
 $("#modalClose").onclick=closeAll;
 $("#overlay").onclick=closeAll;
