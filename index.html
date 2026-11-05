@@ -109,7 +109,7 @@ nav.main > a:hover::after, nav.main .dd:hover > button::after{transform:scaleX(1
 section{padding:84px 0;scroll-margin-top:110px}
 .sec-head{text-align:center;margin-bottom:44px}
 .sec-head h2{font-size:clamp(1.9rem,3.4vw,2.6rem);margin-top:10px}
-.cats{display:grid;grid-template-columns:repeat(8,1fr);gap:12px}
+.cats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
 .cat{background:var(--white);border:1px solid var(--line);text-align:center;padding:22px 8px 18px;transition:all .25s}
 .cat:hover{border-color:var(--ink);transform:translateY(-3px)}
 .cat img{width:64px;height:84px;margin:0 auto 12px;object-fit:contain}
@@ -236,6 +236,19 @@ footer a:hover{color:#fff}
 input::placeholder{color:#9b908a;opacity:1}
 .selects select,.search-bar input{color:var(--ink)}
 .order-form input:focus,.order-form select:focus{border-color:var(--ink)}
+.coupon{margin-bottom:12px}
+.coupon-row{display:flex;gap:8px}
+.coupon-row input{flex:1;min-width:0;font:inherit;font-size:.9rem;color:var(--ink);padding:10px 12px;border:1px dashed var(--taupe);background:var(--bg);outline:none;text-transform:uppercase}
+.coupon-row input::placeholder{text-transform:none}
+.coupon-row input:focus{border-style:solid;border-color:var(--ink)}
+.coupon-row .btn{padding:10px 16px;font-size:.7rem;letter-spacing:.14em}
+.coupon-ok{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#EEF6F0;border:1px solid #CFE5D6;color:#1f5f35;padding:10px 12px;font-size:.88rem}
+.coupon-ok b{font-weight:500}
+.coupon-err{font-size:.8rem;color:#b0482f;min-height:0;margin-top:6px}
+.coupon-err:empty{display:none}
+.sub-rows{font-size:.88rem;color:var(--ink-2);margin-bottom:6px}
+.sub-rows div{display:flex;justify-content:space-between;padding:2px 0}
+.sub-rows .disc{color:#1f7a3f}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .total{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
 .total b{font-family:var(--serif);font-weight:400;font-size:1.45rem}
@@ -302,10 +315,27 @@ input::placeholder{color:#9b908a;opacity:1}
 .ship-bar{height:4px;background:var(--line);overflow:hidden}
 .ship-bar i{display:block;height:100%;background:var(--rose-deep);transition:width .4s}
 .ship.done p{color:#1f7a3f}
+/* ---------- A pedido ---------- */
+.badge.pedido{background:#DAD0C7;color:#3B332C}
+.encargos{background:#F6F1EC;border-top:1px solid var(--line);padding:64px 0}
+.enc-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:40px;align-items:center}
+.encargos h2{font-size:clamp(1.7rem,3vw,2.3rem);margin:8px 0 12px}
+.encargos p{color:var(--ink-2);max-width:560px}
+.enc-actions{display:flex;flex-direction:column;gap:12px}
+.encargo-box{background:#F6F1EC;border:1px solid var(--line);padding:18px;margin-bottom:12px}
+.encargo-box p{font-size:.92rem;color:var(--ink-2);margin-bottom:14px}
+.encargo-box b{font-weight:500;color:var(--ink)}
+.encargo-box .btn{width:100%}
+#encargoBtn[aria-disabled="true"]{opacity:.4;pointer-events:none}
+.enc-foto{margin-top:40px;background:#F6F1EC;border:1px solid var(--line);padding:22px 26px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.enc-foto b{font-family:var(--serif);font-weight:400;font-size:1.25rem;display:block;margin-bottom:2px}
+.enc-foto span{color:var(--ink-2);font-size:.93rem}
+@media (max-width:760px){.enc-foto{flex-direction:column;text-align:center}.enc-foto .btn{width:100%}}
+
 /* ---------- Mobile ---------- */
 @media (max-width:980px){
   .grid{grid-template-columns:repeat(3,1fr)}
-  .cats{grid-template-columns:repeat(4,1fr)}
+  .cats{grid-template-columns:repeat(5,1fr)}
   .foot-grid{grid-template-columns:1fr 1fr}
 }
 @media (max-width:760px){
@@ -326,7 +356,8 @@ input::placeholder{color:#9b908a;opacity:1}
   .hero-actions{justify-content:center}
   .hero-collage{height:460px;margin-bottom:30px}
   section{padding:60px 0}
-  .cats{grid-template-columns:repeat(4,1fr);gap:8px}
+  .cats{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+  .cats .cat{width:calc(25% - 6px)}
   .cat{padding:14px 4px 12px}
   .cat img{width:42px;height:56px;margin-bottom:8px}
   .cat span{font-size:.82rem}
@@ -346,6 +377,8 @@ input::placeholder{color:#9b908a;opacity:1}
   .detail h2{font-size:1.6rem}
   .foot-grid{grid-template-columns:1fr}
   .local-grid{grid-template-columns:1fr;gap:34px}
+  .enc-grid{grid-template-columns:1fr;gap:22px;text-align:center}
+  .encargos p{margin:0 auto}
   .local-card{padding:40px 22px}
   .welcome{padding:60px 0 50px}
   .band{padding:64px 0}
@@ -439,6 +472,7 @@ input::placeholder{color:#9b908a;opacity:1}
     </div>
     <div class="result-info" id="resultInfo"></div>
     <div class="grid" id="grid"></div>
+    <div id="catExtra"></div>
   </div>
 </section>
 
@@ -552,15 +586,21 @@ input::placeholder{color:#9b908a;opacity:1}
       <div class="price" id="pPrice"></div>
       <p class="desc" id="pDesc"></p>
       <ul class="feat" id="pFeat"></ul>
-      <div class="label">Talle <span id="pSizeNote"></span></div>
+      <div class="label" id="sizeLabel">Talle <span id="pSizeNote"></span></div>
       <div class="size-row" id="pSizes"></div>
+      <div id="buyBox">
       <div class="label">Cantidad <span id="stockNote"></span></div>
       <div class="buy-row">
         <div class="qty"><button id="qMinus" aria-label="Menos">−</button><span id="qVal">1</span><button id="qPlus" aria-label="Más">+</button></div>
         <button class="btn btn-dark" id="addBtn">Agregar al carrito</button>
       </div>
+      </div>
+      <div id="encargoBox" class="encargo-box" style="display:none">
+        <p><b>Modelo a pedido.</b> Lo encargamos en tu talle. El pedido se confirma con una seña, que coordinamos por WhatsApp. Elegí tu talle para continuar.</p>
+        <a class="btn btn-dark" id="encargoBtn" target="_blank" rel="noopener" aria-disabled="true">Encargar por WhatsApp</a>
+      </div>
       <div class="hint" id="hint"></div>
-      <a class="ask" id="askBtn" target="_blank" rel="noopener">Consultar por esta prenda en WhatsApp</a>
+      <a class="ask" id="askBtn" target="_blank" rel="noopener">¿Tenés dudas? Consultanos por WhatsApp</a>
     </div>
   </div>
 </div>
@@ -584,7 +624,13 @@ input::placeholder{color:#9b908a;opacity:1}
       </div>
       <input id="fCity" placeholder="Ciudad y provincia (para el envío)">
     </div>
+    <div class="coupon" id="couponBox">
+      <div class="coupon-row" id="couponForm"><input id="cuponInput" placeholder="¿Tenés un código de descuento?" autocomplete="off" autocapitalize="characters"><button type="button" class="btn btn-light" id="cuponBtn">Aplicar</button></div>
+      <div class="coupon-ok" id="couponOk" style="display:none"><span>✓ Cupón <b id="cOkCode"></b> <span id="cOkDesc"></span></span><button type="button" class="rm" id="cuponQuitar">Quitar</button></div>
+      <p class="coupon-err" id="cuponErr"></p>
+    </div>
     <div class="ship" id="ship"><p id="shipTxt"></p><div class="ship-bar"><i id="shipBar"></i></div></div>
+    <div class="sub-rows" id="subRows" style="display:none"><div><span>Subtotal</span><span id="cSub"></span></div><div class="disc"><span id="cDiscLbl"></span><span id="cDisc"></span></div></div>
     <div class="total"><span class="eyebrow" style="color:var(--ink)">Total</span><b id="cartTotal">$0</b></div>
     <a class="btn btn-wa" id="sendOrder" target="_blank" rel="noopener">
       <svg viewBox="0 0 32 32" width="20" height="20" fill="#fff"><path d="M16 3C9 3 3.3 8.6 3.3 15.6c0 2.4.7 4.7 1.9 6.7L3 29l6.9-2.1c1.9 1 4 1.6 6.1 1.6 7 0 12.7-5.6 12.7-12.6S23 3 16 3Z"/></svg>
@@ -614,6 +660,10 @@ const CONFIG = {
   // Más adelante: link CSV de la planilla de Google publicada.
   // Mientras esté vacío se usan los productos de ejemplo de abajo.
   sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRebpf8r6xx1xze75vMvfPWE9ZJBPWxXCL1ftLltYOlZ_1yOVEn9CN7W5znIel-IAu4BtnHLvBMiZEx/pub?gid=0&single=true&output=csv",
+  // Google Analytics: ID de medición (G-XXXXXXX). Vacío = sin estadísticas
+  gaId: "G-XHE7K7E3VZ",
+  // Link CSV de la hoja "Cupones" publicada. Vacío = sin cupones
+  cuponesCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRebpf8r6xx1xze75vMvfPWE9ZJBPWxXCL1ftLltYOlZ_1yOVEn9CN7W5znIel-IAu4BtnHLvBMiZEx/pub?gid=217773205&single=true&output=csv",
   // Carpeta donde se suben las fotos (junto a esta página)
   carpetaFotos: "Fotos/",
   // Foto grande de la portada (dentro de la carpeta de fotos). Vacío = usa fotos de prendas
@@ -627,8 +677,12 @@ const HORARIOS = {dias:[1,2,3,4,5,6], turnos:[["09:00","12:30"],["17:00","20:30"
 
 const CATEGORIAS = {
   "Ropa": ["Remeras","Camisas y Blusas","Pantalones","Shorts","Conjuntos","Sastrería","Abrigos"],
-  "Calzado": ["Zapatillas"]
+  "Calzado": ["Zapatillas"],
+  "Accesorios": [],
+  "Papelería": []
 };
+// Talles que se ofrecen en las zapatillas a pedido (si la columna "talles" queda vacía)
+const TALLES_PEDIDO = "35,36,37,38,39,40";
 
 /* =========================================================
    PRODUCTOS DE EJEMPLO
@@ -637,6 +691,11 @@ const CATEGORIAS = {
    descripcion · caracteristicas · fotos · nuevo · disponible
    ========================================================= */
 const EJEMPLO = [
+  {id:"A01",nombre:"Cartera Bandolera Negra",categoria:"Accesorios",subcategoria:"",precio:42000,talles:"2",descripcion:"Cartera de cuero ecológico con correa regulable y cierre metálico.",caracteristicas:"Material: Cuero ecológico; Color: Negro; Medidas: 24 × 16 cm",color:"#2A2A2A",nuevo:"si"},
+  {id:"A02",nombre:"Cinturón Hebilla Dorada",categoria:"Accesorios",subcategoria:"",precio:15500,talles:"1",descripcion:"Cinturón fino con hebilla dorada, ideal para marcar la cintura.",caracteristicas:"Material: Cuero ecológico; Color: Camel",color:"#B38B62"},
+  {id:"L01",nombre:"Agenda 2027 Tapa Dura",categoria:"Papelería",subcategoria:"",precio:19900,talles:"5",descripcion:"Agenda semanal 2027 con tapa dura, elástico y cinta señaladora.",caracteristicas:"Formato: A5; Hojas: 160; Diseño: Semana a la vista",color:"#E8C9C1",nuevo:"si"},
+  {id:"L02",nombre:"Libreta Lisa Beige",categoria:"Papelería",subcategoria:"",precio:8900,talles:"3",descripcion:"Libreta de hojas lisas con tapa de lino.",caracteristicas:"Formato: A6; Hojas: 96",color:"#D7C4A8"},
+  {id:"E01",nombre:"Zapatilla Urbana Beige",categoria:"Calzado",subcategoria:"Zapatillas",precio:71000,talles:"",descripcion:"Zapatilla de cuero ecológico con suela de goma. Modelo a pedido.",caracteristicas:"Material: Cuero ecológico; Color: Beige; Suela: Goma",color:"#CDB79E",disponible:"pedido"},
   {id:"R01",nombre:"Remera Lino Básica",categoria:"Ropa",subcategoria:"Remeras",precio:18500,talles:"S,M,L",descripcion:"Remera de lino de corte recto, fresca y fácil de combinar.",caracteristicas:"Tela: Lino; Color: Crudo; Calce: Recto",color:"#E9E1D4",nuevo:"si"},
   {id:"R02",nombre:"Remera Morley Negra",categoria:"Ropa",subcategoria:"Remeras",precio:15900,talles:"S,M,L,XL",descripcion:"Básica de morley con caída suave, ideal para usar sola o debajo de un blazer.",caracteristicas:"Tela: Morley; Color: Negro; Calce: Al cuerpo",color:"#2A2A2A"},
   {id:"R03",nombre:"Remerón Oversize Arena",categoria:"Ropa",subcategoria:"Remeras",precio:21000,talles:"Único",descripcion:"Remerón amplio de algodón peinado. Prenda única.",caracteristicas:"Tela: Algodón; Color: Arena; Calce: Oversize",color:"#CDB79E",nuevo:"si"},
@@ -671,6 +730,8 @@ const SHAPES = {
   Conjuntos:'<path d="M115 52 90 60 68 90 88 106 102 94V160H198V94L212 106 232 90 210 60 185 52Q150 76 115 52Z"/><path d="M110 172H190L203 352H163L150 224 137 352H97Z"/>',
   Abrigos:'<path d="M115 66 84 80 60 304 88 309 100 160V345H200V160L212 309 240 304 216 80 185 66 150 100Z"/><path d="M115 66 150 100 150 200 128 140Z M185 66 150 100 150 200 172 140Z" opacity=".55"/>',
   "Sastrería":'<path d="M112 72 84 84 64 290 90 295 102 165V318H198V165L210 295 236 290 216 84 188 72 150 92Z"/><path d="M112 72 150 92 150 205 124 128Z M188 72 150 92 150 205 176 128Z" opacity=".5"/><circle cx="150" cy="222" r="4" opacity=".55"/><path d="M110 250H134M166 250H190" stroke="currentColor" stroke-width="3" opacity=".45"/>',
+  Accesorios:'<path d="M90 170H210L225 320H75Z"/><path d="M115 170Q115 110 150 110Q185 110 185 170" fill="none" stroke="currentColor" stroke-width="10"/><rect x="138" y="200" width="24" height="14" rx="3" opacity=".5"/>',
+  "Papelería":'<rect x="85" y="80" width="135" height="240" rx="6"/><rect x="85" y="80" width="18" height="240" opacity=".45"/><rect x="200" y="80" width="8" height="240" opacity=".3"/><rect x="120" y="140" width="70" height="10" rx="3" fill="#fff" opacity=".55"/>',
   Zapatillas:'<path d="M44 250 56 186Q88 182 110 156H152Q172 198 222 208Q258 214 258 245V262H44Z"/><path d="M44 262H258V278H44Z" opacity=".45"/><g opacity=".5" stroke-width="3" fill="none" stroke="currentColor"><path d="M118 172 132 184M128 166 142 180M138 162 152 176"/></g>'
 };
 function shade(hex, amt){
@@ -694,6 +755,21 @@ const SIN_FOTO="data:image/svg+xml;charset=utf-8,"+encodeURIComponent('<svg xmln
 document.addEventListener("error",e=>{const t=e.target;if(t&&t.tagName==="IMG"&&t.dataset.fb!=="1"){t.dataset.fb="1";t.src=SIN_FOTO}},true);
 
 /* =========================================================
+   ESTADÍSTICAS (Google Analytics)
+   ========================================================= */
+(function(){
+  if(!CONFIG.gaId) return;
+  const sc=document.createElement("script"); sc.async=true;
+  sc.src="https://www.googletagmanager.com/gtag/js?id="+encodeURIComponent(CONFIG.gaId);
+  document.head.appendChild(sc);
+  window.dataLayer=window.dataLayer||[];
+  window.gtag=function(){dataLayer.push(arguments)};
+  gtag("js",new Date()); gtag("config",CONFIG.gaId);
+})();
+function track(ev,params){try{if(window.gtag) gtag("event",ev,params||{})}catch(e){}}
+function gaItem(p,size,qty){return {item_id:p.id,item_name:p.nombre,item_category:p.categoria,item_category2:p.subcategoria||undefined,item_variant:p.sinTalle?undefined:size,price:p.precio,quantity:qty||1}}
+
+/* =========================================================
    ESTADO
    ========================================================= */
 let PRODUCTS=[],LOAD_ERROR=false;
@@ -711,17 +787,23 @@ function photoUrl(f){return /^(https?:|data:)/i.test(f)?f:CONFIG.carpetaFotos+en
 function normalize(list){
   const seen={};
   return list.filter(p=>String(p.nombre||"").trim()&&String(p.disponible??"si").trim().toLowerCase()!=="no").map((p,i)=>{
+    const encargo=String(p.disponible||"").trim().toLowerCase()==="pedido";
+    let tRaw=String(p.talles||"").trim(); if(encargo&&!tRaw) tRaw=TALLES_PEDIDO;
+    const sinTalle=/^\d*$/.test(tRaw);
     let id=String(p.id||"").trim()||slug(p.nombre); if(seen[id]) id+="-"+(++seen[id]); else seen[id]=1;
     const stock={};
-    String(p.talles||"").split(/[,|;]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{
+    tRaw.split(/[,|;]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{
       const m=s.match(/^(.+?)\s*(?::|\()\s*(\d+)\s*\)?$/); const t=(m?m[1]:s).trim(), n=m?parseInt(m[2],10):1;
       if(t&&n>0) stock[t]=(stock[t]||0)+n;
     });
+    if(sinTalle){const n=tRaw===""?(encargo?1:0):parseInt(tRaw,10);Object.keys(stock).forEach(k=>delete stock[k]);if(n>0||encargo)stock["-"]=n||1}
+    if(encargo) Object.keys(stock).forEach(k=>stock[k]=99);
     const talles=Object.keys(stock);
+    const precioN=parsePrice(p.precio);
     let fotos=String(p.fotos||"").split(/[,|;\n]/).map(s=>s.trim()).filter(Boolean).map(photoUrl);
-    if(!fotos.length) fotos=[0,1,2].map(v=>fakePhoto(p.subcategoria,p.color||"#CDB79E",v));
+    if(!fotos.length) fotos=[0,1,2].map(v=>fakePhoto(p.subcategoria||p.categoria,p.color||"#CDB79E",v));
     const caract=String(p.caracteristicas||"").split(";").map(s=>s.split(":")).filter(a=>a[0]&&a[0].trim()).map(a=>[a[0].trim(),(a.slice(1).join(":")||"").trim()]);
-    return {...p,id,nombre:String(p.nombre).trim(),categoria:String(p.categoria||"").trim(),subcategoria:String(p.subcategoria||"").trim(),precio:parsePrice(p.precio),talles,stock,fotos,caract,nuevo:String(p.nuevo||"").trim().toLowerCase()==="si",orden:i};
+    return {...p,id,nombre:String(p.nombre).trim(),categoria:String(p.categoria||"").trim(),subcategoria:String(p.subcategoria||"").trim(),precio:precioN,talles,stock,sinTalle,encargo,fotos,caract,nuevo:String(p.nuevo||"").trim().toLowerCase()==="si",orden:i};
   }).filter(p=>p.talles.length);
 }
 
@@ -735,6 +817,31 @@ function parseCSV(text){
   const head=rows.shift().map(h=>h.trim().toLowerCase());
   return rows.filter(r=>r.some(x=>x.trim())).map(r=>Object.fromEntries(head.map((h,i)=>[h,(r[i]||"").trim()])));
 }
+/* ---------- Cupones ---------- */
+const CUPONES_EJEMPLO=[{codigo:"TRENDY10",tipo:"porcentaje",valor:"10",activo:"si"},{codigo:"BIENVENIDA",tipo:"monto",valor:"5000",activo:"si",minimo:"30000"}];
+let CUPONES=[], cuponCode="";
+try{cuponCode=localStorage.getItem("trendy_cupon")||""}catch(e){}
+function parseFecha(v){v=String(v||"").trim();if(!v)return null;let m=v.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+  if(m){let y=+m[3];if(y<100)y+=2000;return new Date(y,+m[2]-1,+m[1],23,59,59)}
+  m=v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3],23,59,59);return null}
+function normCupones(list){return list.map(c=>({codigo:String(c.codigo||"").trim().toUpperCase(),pct:/%|porc/i.test(String(c.tipo||""))||/%$/.test(String(c.valor||"")),
+  valor:parseFloat(String(c.valor||"").replace(/[^\d,.]/g,"").replace(/\.(?=\d{3}\b)/g,"").replace(",","."))||0,
+  activo:String(c.activo||"si").trim().toLowerCase()!=="no",vence:parseFecha(c.vence),minimo:parsePrice(c.minimo)})).filter(c=>c.codigo&&c.valor>0)}
+async function loadCupones(){
+  if(CONFIG.cuponesCsvUrl){try{const u=CONFIG.cuponesCsvUrl+(CONFIG.cuponesCsvUrl.includes("?")?"&":"?")+"t="+Date.now();
+    const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw 0;return normCupones(parseCSV(await r.text()))}catch(e){console.warn("No se pudieron leer los cupones");return []}}
+  return CONFIG.sheetCsvUrl?[]:normCupones(CUPONES_EJEMPLO);
+}
+function evalCupon(code,subtotal){
+  if(!code) return {monto:0};
+  const c=CUPONES.find(x=>x.codigo===code.toUpperCase());
+  if(!c||!c.activo) return {monto:0,error:"Ese código no es válido."};
+  if(c.vence&&new Date()>c.vence) return {monto:0,error:"Este cupón ya venció."};
+  if(c.minimo&&subtotal<c.minimo) return {monto:0,cupon:c,error:`Este cupón es válido con compras desde ${money(c.minimo)}.`};
+  const monto=Math.min(subtotal,Math.round(c.pct?subtotal*c.valor/100:c.valor));
+  return {monto,cupon:c,desc:c.pct?`${c.valor}% off`:`${money(c.valor)} off`};
+}
+
 async function loadProducts(){
   if(CONFIG.sheetCsvUrl){
     try{
@@ -756,41 +863,54 @@ function renderStatic(){
   $("#igHandle").textContent="@"+CONFIG.instagram;
   const hola=waLink("¡Hola Trendy! Quería hacer una consulta 😊");
   ["#waBtn","#waFloat","#footWa"].forEach(s=>$(s).href=hola);
+  ENC_FOTO=waLink("¡Hola Trendy! 👋🏻 Quería consultar si pueden conseguir esta prenda (te mando la foto):");
   $("#footWa").textContent="WhatsApp "+CONFIG.whatsappVisible;
   $("#year").textContent=new Date().getFullYear();
   $("#mapBtn").href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(CONFIG.direccionMapa);
   openNow();
 
   // menú desplegable
-  $("#ddMenu").innerHTML=Object.entries(CATEGORIAS).map(([c,subs])=>
-    `<div><h4>${c}</h4>${[`<button data-cat="${c}">Ver todo ${c.toLowerCase()}</button>`,...subs.map(s=>`<button data-cat="${s}">${s}</button>`)].join("")}</div>`).join("");
-  $("#footCats").innerHTML=[...CATEGORIAS.Ropa,"Calzado"].map(s=>`<li><a href="#catalogo" data-cat="${s==="Calzado"?"Calzado":s}">${s}</a></li>`).join("");
+  $("#ddMenu").innerHTML=`<div><h4>Ropa</h4><button data-cat="Ropa">Ver toda la ropa</button>${CATEGORIAS.Ropa.map(s=>`<button data-cat="${s}">${s}</button>`).join("")}</div>`+
+    `<div><h4>Más secciones</h4>${Object.keys(CATEGORIAS).filter(c=>c!=="Ropa").map(c=>`<button data-cat="${c}">${c}</button>`).join("")}</div>`;
+  $("#footCats").innerHTML=[...CATEGORIAS.Ropa,"Calzado","Accesorios","Papelería"].map(s=>`<li><a href="#catalogo" data-cat="${s}">${s}</a></li>`).join("");
 
   // tarjetas de categoría
-  const catTiles=[...CATEGORIAS.Ropa.map(s=>[s,s]),["Calzado","Zapatillas"]];
-  const tones={Remeras:"#CDB79E","Camisas y Blusas":"#E4CFB2",Pantalones:"#2A2A2A",Shorts:"#B9A48E",Conjuntos:"#6B6A4E","Sastrería":"#7E7A76",Abrigos:"#B38B62",Zapatillas:"#3A3A3A"};
+  const catTiles=[...CATEGORIAS.Ropa.map(s=>[s,s]),["Calzado","Zapatillas"],["Accesorios","Accesorios"],["Papelería","Papelería"]];
+  const tones={Remeras:"#CDB79E","Camisas y Blusas":"#E4CFB2",Pantalones:"#2A2A2A",Shorts:"#B9A48E",Conjuntos:"#6B6A4E","Sastrería":"#7E7A76",Abrigos:"#B38B62",Zapatillas:"#3A3A3A",Accesorios:"#8C6E5A","Papelería":"#D9B9AE"};
   $("#cats").innerHTML=catTiles.map(([label,shape])=>`<button class="cat" data-cat="${label}"><img src="${fakeIcon(shape,tones[shape])}" alt=""><span>${label}</span></button>`).join("");
 
   // chips
-  $("#chips").innerHTML=["Todos",...CATEGORIAS.Ropa,"Calzado"].map(c=>`<button class="chip" data-chip="${c}">${c}</button>`).join("");
+  $("#chips").innerHTML=["Todos",...CATEGORIAS.Ropa,"Calzado","Accesorios","Papelería"].map(c=>`<button class="chip" data-chip="${c}">${c}</button>`).join("");
 
   // hero
-  const destacados=[...PRODUCTS.filter(p=>p.nuevo),...PRODUCTS.filter(p=>!p.nuevo)];
+  const destacados=[...PRODUCTS.filter(p=>p.nuevo&&!p.encargo),...PRODUCTS.filter(p=>!p.nuevo&&!p.encargo),...PRODUCTS];
   const h1=PRODUCTS.find(p=>p.id==="J01")||destacados[0], h2=PRODUCTS.find(p=>p.id==="C01")||destacados[1]||destacados[0];
   if(h1)
   $("#heroCollage").innerHTML=`<figure class="hc1"><img src="${CONFIG.fotoPortada&&CONFIG.sheetCsvUrl?photoUrl(CONFIG.fotoPortada):h1.fotos[0]}" alt="Trendy"></figure><figure class="hc2"><img src="${CONFIG.fotoPortada2&&CONFIG.sheetCsvUrl?photoUrl(CONFIG.fotoPortada2):(CONFIG.fotoPortada&&CONFIG.sheetCsvUrl?h1:h2).fotos[0]}" alt=""></figure><div class="hero-badge">Nuevos ingresos</div>`;
 
-  // talles
-  const allSizes=[...new Set(PRODUCTS.flatMap(p=>p.talles))];
-  const order=["XS","S","M","L","XL","XXL","Único"];
-  allSizes.sort((a,b)=>{const ia=order.indexOf(a),ib=order.indexOf(b);if(ia>-1||ib>-1)return (ia<0?99:ia)-(ib<0?99:ib);return parseFloat(a)-parseFloat(b)});
-  $("#sizeFilter").innerHTML=`<option value="">Todos los talles</option>`+allSizes.map(s=>`<option value="${esc(s)}">Talle ${esc(s)}</option>`).join("");
+}
+const ORDEN_TALLES=["XS","S","M","L","XL","XXL","Único"];
+function sortSizes(a,b){const ia=ORDEN_TALLES.indexOf(a),ib=ORDEN_TALLES.indexOf(b);if(ia>-1||ib>-1)return (ia<0?99:ia)-(ib<0?99:ib);return parseFloat(a)-parseFloat(b)}
+function enSeccion(p){return state.cat==="Todos"||p.categoria===state.cat||p.subcategoria===state.cat}
+function renderSizeFilter(){
+  const sel=$("#sizeFilter"), base=PRODUCTS.filter(p=>!p.sinTalle&&enSeccion(p));
+  const grupos={};
+  base.forEach(p=>{const g=p.categoria==="Calzado"?"Calzado":"Ropa";(grupos[g]=grupos[g]||new Set());p.talles.forEach(t=>grupos[g].add(t))});
+  const nombres=Object.keys(grupos).sort((a,b)=>a==="Ropa"?-1:1);
+  const all=new Set(nombres.flatMap(g=>[...grupos[g]]));
+  if(state.size&&!all.has(state.size)) state.size="";
+  const opts=g=>[...grupos[g]].sort(sortSizes).map(s=>`<option value="${esc(s)}">Talle ${esc(s)}</option>`).join("");
+  sel.innerHTML=`<option value="">Todos los talles</option>`+(nombres.length>1?nombres.map(g=>`<optgroup label="${g}">${opts(g)}</optgroup>`).join(""):nombres.map(opts).join(""));
+  sel.value=state.size; sel.style.display=all.size?"":"none";
 }
 function fakeIcon(sub,color){
   const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 40 240 330"><g fill="${color}" color="${shade(color,-40)}">${SHAPES[sub]}</g></svg>`;
   return "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
 }
 
+let ENC_FOTO="#";
+function rangoTalles(t){const n=t.map(Number);if(n.length>2&&n.every((x,i)=>!isNaN(x)&&(i===0||x===n[i-1]+1)))return `${t[0]} al ${t[t.length-1]}`;return t.join(" · ")}
+const talleTxt=(p,size)=>p.sinTalle?"":`Talle ${size}`;
 function filtered(){
   let list=PRODUCTS.filter(p=>{
     if(state.cat!=="Todos" && p.categoria!==state.cat && p.subcategoria!==state.cat) return false;
@@ -807,17 +927,20 @@ function filtered(){
   return list;
 }
 function renderGrid(){
+  renderSizeFilter();
   const list=filtered();
+  const zap=state.cat==="Calzado"||state.cat==="Zapatillas";
+  $("#catExtra").innerHTML=zap&&PRODUCTS.length?`<div class="enc-foto"><div><b>¿Buscás otro modelo?</b><span>Mandanos la foto y te decimos si lo podemos conseguir.</span></div><a class="btn btn-light" href="${ENC_FOTO}" target="_blank" rel="noopener" data-wa="foto-zapatilla">Enviar foto por WhatsApp</a></div>`:"";
   document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c.dataset.chip===state.cat));
   $("#catTitle").textContent=state.cat==="Todos"?"Todos los productos":state.cat;
   $("#resultInfo").textContent=(state.q?`Resultados para «${state.q}» · `:"")+list.length+(list.length===1?" producto":" productos");
   $("#grid").innerHTML=list.length?list.map(p=>{
     const units=Object.values(p.stock).reduce((a,n)=>a+n,0);
-    const last=p.talles[0]==="Único"&&units===1?'<span class="badge dark">Prenda única</span>':units===1?'<span class="badge dark">Última unidad</span>':p.talles.length===1?'<span class="badge dark">Último talle</span>':p.nuevo?'<span class="badge">Nuevo</span>':"";
+    const last=p.encargo?'<span class="badge pedido">A pedido</span>':p.talles[0]==="Único"&&units===1?'<span class="badge dark">Prenda única</span>':units===1?'<span class="badge dark">Última unidad</span>':p.talles.length===1?'<span class="badge dark">Último talle</span>':p.nuevo?'<span class="badge">Nuevo</span>':"";
     return `<button class="card" data-id="${esc(p.id)}">
-      <div class="ph">${last}<img src="${p.fotos[0]}" alt="${esc(p.nombre)}" loading="lazy">${p.fotos[1]?`<img class="alt" src="${p.fotos[1]}" alt="" loading="lazy">`:""}<span class="quick">Ver prenda</span></div>
-      <h3>${esc(p.nombre)}</h3><div class="price">${money(p.precio)}</div><div class="sizes">Talles: ${p.talles.map(esc).join(" · ")}</div>
-    </button>`}).join(""):(LOAD_ERROR?`<div class="empty" style="grid-column:1/-1">No pudimos cargar el catálogo. Probá recargar la página en unos minutos o escribinos por WhatsApp.</div>`:!PRODUCTS.length?`<div class="empty" style="grid-column:1/-1">Estamos cargando nuevas prendas. ¡Volvé pronto!</div>`:`<div class="empty" style="grid-column:1/-1">No encontramos prendas con esos filtros.<br><br><button class="btn btn-light" id="resetF">Ver todo</button></div>`);
+      <div class="ph">${last}<img src="${p.fotos[0]}" alt="${esc(p.nombre)}" loading="lazy">${p.fotos[1]?`<img class="alt" src="${p.fotos[1]}" alt="" loading="lazy">`:""}<span class="quick">${p.encargo?"Encargar":"Ver detalle"}</span></div>
+      <h3>${esc(p.nombre)}</h3><div class="price">${money(p.precio)}</div><div class="sizes">${p.encargo?`A pedido · Talles ${esc(rangoTalles(p.talles))}`:p.sinTalle?(units===1?"Última unidad":"Disponible"):"Talles: "+p.talles.map(esc).join(" · ")}</div>
+    </button>`}).join(""):(LOAD_ERROR?`<div class="empty" style="grid-column:1/-1">No pudimos cargar el catálogo. Probá recargar la página en unos minutos o escribinos por WhatsApp.</div>`:!PRODUCTS.length?`<div class="empty" style="grid-column:1/-1">Estamos cargando nuevas prendas. ¡Volvé pronto!</div>`:(`<div class="empty" style="grid-column:1/-1">No encontramos prendas con esos filtros.<br><br><button class="btn btn-light" id="resetF">Ver todo</button></div>`));
 }
 
 /* ---------- Ficha ---------- */
@@ -825,18 +948,22 @@ let cur=null,curImg=0,curSize="",curQty=1;
 function openProduct(id){
   cur=PRODUCTS.find(p=>p.id===id); if(!cur) return;
   curImg=0;curQty=1;curSize=cur.talles.length===1?cur.talles[0]:"";
-  $("#pCrumb").textContent=cur.categoria+" / "+cur.subcategoria;
+  $("#pCrumb").textContent=cur.categoria+(cur.subcategoria?" / "+cur.subcategoria:"")+(cur.encargo?" · A pedido":"");
+  $("#sizeLabel").style.display=$("#pSizes").style.display=cur.sinTalle?"none":"";
+  $("#buyBox").style.display=cur.encargo?"none":"";
+  $("#encargoBox").style.display=cur.encargo?"":"none";
   $("#pName").textContent=cur.nombre;
   $("#pPrice").textContent=money(cur.precio);
   $("#pDesc").textContent=cur.descripcion||"";
   $("#pFeat").innerHTML=cur.caract.map(([k,v])=>`<li><b>${esc(k)}</b>${esc(v)}</li>`).join("");
   $("#pFeat").style.display=cur.caract.length?"":"none";
-  $("#pSizeNote").textContent=cur.talles.length===1?(cur.talles[0]==="Único"?"Talle único":"Último talle disponible"):"Elegí tu talle";
+  $("#pSizeNote").textContent=cur.encargo?"Elegí tu talle":cur.talles.length===1?(cur.talles[0]==="Único"?"Talle único":"Último talle disponible"):"Elegí tu talle";
   $("#pSizes").innerHTML=cur.talles.map(t=>`<button class="size-btn${t===curSize?" on":""}" data-size="${esc(t)}">${esc(t)}</button>`).join("");
   $("#hint").textContent=""; updateQtyUI();
   $("#thumbs").innerHTML=cur.fotos.map((f,i)=>`<button data-img="${i}"><img src="${f}" alt=""></button>`).join("");
   $("#gPrev").style.display=$("#gNext").style.display=cur.fotos.length>1?"":"none";
   setImg(0); updateAsk();
+  track("view_item",{currency:"ARS",value:cur.precio,items:[gaItem(cur)]});
   $("#modal").classList.add("on");$("#overlay").classList.add("on");document.body.style.overflow="hidden";
 }
 function enCarrito(id,size){return cart.filter(c=>c.id===id&&c.size===size).reduce((a,c)=>a+c.qty,0)}
@@ -844,12 +971,19 @@ function disponible(p,size){return Math.max(0,(p.stock[size]||0)-enCarrito(p.id,
 function updateQtyUI(){
   const st=$("#stockNote"), add=$("#addBtn");
   if(!curSize){curQty=1;$("#qVal").textContent=1;st.textContent="";add.removeAttribute("aria-disabled");$("#qPlus").classList.remove("max");return}
-  const total=cur.stock[curSize]||0, inCart=enCarrito(cur.id,curSize), max=disponible(cur,curSize);
+  updateEncargo(); if(cur.encargo) return;
+  const total=cur.stock[curSize]||0, inCart=enCarrito(cur.id,curSize), max=disponible(cur,curSize), dt=cur.sinTalle?"":" de este talle";
   curQty=Math.max(1,Math.min(curQty,max||1)); $("#qVal").textContent=curQty;
   st.textContent=(total===1?"Última unidad disponible":`${total} unidades disponibles`)+(inCart?` · ya tenés ${inCart} en tu carrito`:"");
   $("#qPlus").classList.toggle("max",curQty>=max);
-  if(max===0){add.setAttribute("aria-disabled","true");$("#hint").textContent="Ya agregaste al carrito todas las unidades disponibles de este talle."}
+  if(max===0){add.setAttribute("aria-disabled","true");$("#hint").textContent=`Ya agregaste al carrito todas las unidades disponibles${dt}.`}
   else{add.removeAttribute("aria-disabled");}
+}
+function updateEncargo(){
+  if(!cur||!cur.encargo) return;
+  const a=$("#encargoBtn"), ok=!!curSize;
+  a.setAttribute("aria-disabled",ok?"false":"true");
+  a.href=ok?waLink(`¡Hola Trendy! 👋🏻 Quiero encargar:\n\n• ${cur.nombre}${cur.sinTalle?"":" — Talle "+curSize} — ${money(cur.precio)}\n\n¿Cómo coordinamos la seña? ¡Gracias!`):"#";
 }
 function setImg(i){
   curImg=(i+cur.fotos.length)%cur.fotos.length;
@@ -857,7 +991,7 @@ function setImg(i){
   document.querySelectorAll("#thumbs button").forEach((b,j)=>b.classList.toggle("on",j===curImg));
 }
 function updateAsk(){
-  $("#askBtn").href=waLink(`¡Hola Trendy! Quería consultar por: ${cur.nombre}${curSize?" (talle "+curSize+")":""} — ${money(cur.precio)}`);
+  $("#askBtn").href=waLink(`¡Hola Trendy! Quería consultar por: ${cur.nombre}${curSize&&!cur.sinTalle?" (talle "+curSize+")":""} — ${money(cur.precio)}`);
 }
 function closeAll(){
   $("#modal").classList.remove("on");$("#drawer").classList.remove("on");$("#overlay").classList.remove("on");document.body.style.overflow="";
@@ -868,10 +1002,12 @@ function saveCart(){try{localStorage.setItem("trendy_cart",JSON.stringify(cart))
 function addToCart(){
   if(!curSize){$("#hint").textContent="Elegí un talle para continuar.";return}
   const max=disponible(cur,curSize);
-  if(max<=0){$("#hint").textContent="Ya agregaste al carrito todas las unidades disponibles de este talle.";return}
+  if(cur.encargo) return;
+  if(max<=0){$("#hint").textContent=`Ya agregaste al carrito todas las unidades disponibles${cur.sinTalle?"":" de este talle"}.`;return}
   if(curQty>max) curQty=max;
   const key=cur.id+"|"+curSize; const ex=cart.find(c=>c.key===key);
   if(ex) ex.qty+=curQty; else cart.push({key,id:cur.id,size:curSize,qty:curQty});
+  track("add_to_cart",{currency:"ARS",value:cur.precio*curQty,items:[gaItem(cur,curSize,curQty)]});
   saveCart();renderCart();closeAll();showAdded(cur,curSize,curQty);
 }
 function cartLines(){
@@ -880,9 +1016,18 @@ function cartLines(){
   return cart.map(c=>({...c,p:PRODUCTS.find(p=>p.id===c.id)})).filter(c=>c.p)}
 function renderCart(){
   const lines=cartLines();
-  const n=lines.reduce((a,c)=>a+c.qty,0), total=lines.reduce((a,c)=>a+c.qty*c.p.precio,0);
+  const n=lines.reduce((a,c)=>a+c.qty,0), subtotal=lines.reduce((a,c)=>a+c.qty*c.p.precio,0);
+  const cu=evalCupon(cuponCode,subtotal), total=subtotal-cu.monto;
   $("#cartCount").textContent=n;$("#cartCount").dataset.n=n;
   $("#cartTotal").textContent=money(total);
+  $("#couponBox").style.display=CUPONES.length?"":"none";
+  $("#couponForm").style.display=cuponCode&&cu.cupon?"none":"";
+  $("#couponOk").style.display=cuponCode&&cu.cupon?"":"none";
+  if(cu.cupon){$("#cOkCode").textContent=cu.cupon.codigo;$("#cOkDesc").textContent="· "+(cu.cupon.pct?`${cu.cupon.valor}% off`:`${money(cu.cupon.valor)} off`);}
+  if(cuponCode&&!cu.cupon){$("#cuponErr").textContent=cu.error||"";}
+  else $("#cuponErr").textContent=cu.monto===0&&cu.error?cu.error:"";
+  $("#subRows").style.display=cu.monto>0?"":"none";
+  $("#cSub").textContent=money(subtotal);$("#cDiscLbl").textContent=cu.cupon?`Descuento (${cu.cupon.codigo})`:"";$("#cDisc").textContent="−"+money(cu.monto);
   const falta=CONFIG.envioGratisDesde-total, sh=$("#ship");
   sh.classList.toggle("done",falta<=0);
   $("#shipTxt").innerHTML=falta>0?`Te faltan <b style="font-weight:500">${money(falta)}</b> para tener envío gratis`:"🎉 ¡Tenés envío gratis!";
@@ -891,18 +1036,20 @@ function renderCart(){
   $("#cartBody").innerHTML=lines.length?lines.map(c=>`
     <div class="ci">
       <img src="${c.p.fotos[0]}" alt="">
-      <div><h4>${esc(c.p.nombre)}</h4><small>Talle ${esc(c.size)} · ${money(c.p.precio)} c/u</small>
+      <div><h4>${esc(c.p.nombre)}</h4><small>${c.p.sinTalle?"":`Talle ${esc(c.size)} · `}${money(c.p.precio)} c/u</small>
         <div class="qty"><button data-dec="${esc(c.key)}" aria-label="Menos">−</button><span>${c.qty}</span><button data-inc="${esc(c.key)}" aria-label="Más">+</button></div></div>
       <div class="right"><b>${money(c.qty*c.p.precio)}</b><button class="rm" data-rm="${esc(c.key)}">Quitar</button></div>
     </div>`).join(""):`<div class="cart-empty"><svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>Tu carrito está vacío.<br><br><button class="btn btn-light" id="goShop">Ver catálogo</button></div>`;
-  updateOrderLink(lines,total);
+  updateOrderLink(lines,total,subtotal,cu);
 }
-function updateOrderLink(lines=cartLines(),total=lines.reduce((a,c)=>a+c.qty*c.p.precio,0)){
+function updateOrderLink(lines=cartLines(),total,subtotal,cu){
+  if(subtotal===undefined){subtotal=lines.reduce((a,c)=>a+c.qty*c.p.precio,0);cu=evalCupon(cuponCode,subtotal);total=subtotal-cu.monto}
   const name=$("#fName").value.trim(), del=$("#fDelivery").value, city=$("#fCity").value.trim(), pay=$("#fPay").value;
   $("#fCity").style.display=del==="Envío"?"":"none";
   let t="¡Hola Trendy! 👋🏻 Quiero hacer este pedido:\n\n";
-  t+=lines.map(c=>`• ${c.p.nombre} — Talle ${c.size} × ${c.qty} — ${money(c.qty*c.p.precio)}`).join("\n");
-  t+=`\n\n*Total: ${money(total)}*\n`;
+  t+=lines.map(c=>`• ${c.p.nombre}${c.p.sinTalle?"":" — Talle "+c.size} × ${c.qty} — ${money(c.qty*c.p.precio)}`).join("\n");
+  if(cu&&cu.monto>0) t+=`\n\nSubtotal: ${money(subtotal)}\nCupón ${cu.cupon.codigo} (${cu.cupon.pct?cu.cupon.valor+"%":money(cu.cupon.valor)} off): −${money(cu.monto)}\n*Total: ${money(total)}*\n`;
+  else t+=`\n\n*Total: ${money(total)}*\n`;
   t+=`\nNombre: ${name||"-"}`;
   t+=`\nEntrega: ${del==="Envío"?"Envío"+(city?" a "+city:""):"Retiro en el local (Clorinda)"}`;
   t+=`\nPago: ${pay}`;
@@ -910,7 +1057,7 @@ function updateOrderLink(lines=cartLines(),total=lines.reduce((a,c)=>a+c.qty*c.p
   const a=$("#sendOrder"); a.href=waLink(t); a.setAttribute("aria-disabled",lines.length?"false":"true");
 }
 function changeQty(key,d){const c=cart.find(x=>x.key===key);if(!c)return;
-  if(d>0){const p=PRODUCTS.find(x=>x.id===c.id);const n=p?(p.stock[c.size]||0):0;if(c.qty>=n){toast(n===1?"Es la única unidad disponible de ese talle":`Solo hay ${n} unidades de ese talle`);return}}
+  if(d>0){const p=PRODUCTS.find(x=>x.id===c.id);const n=p?(p.stock[c.size]||0):0;if(c.qty>=n){toast(n===1?`Es la única unidad disponible${p&&p.sinTalle?"":" de ese talle"}`:`Solo hay ${n} unidades${p&&p.sinTalle?"":" de ese talle"}`);return}}
   c.qty+=d;if(c.qty<1)cart=cart.filter(x=>x!==c);saveCart();renderCart()}
 function openCart(){$("#drawer").classList.add("on");$("#overlay").classList.add("on");document.body.style.overflow="hidden"}
 
@@ -926,9 +1073,9 @@ let at;
 function showAdded(p,size,qty){
   $("#addedImg").src=p.fotos[0];
   $("#addedName").textContent=p.nombre;
-  $("#addedInfo").innerHTML=`Talle ${esc(size)} · Cantidad ${qty} · <b>${money(p.precio*qty)}</b>`;
+  $("#addedInfo").innerHTML=`${p.sinTalle?"":`Talle ${esc(size)} · `}Cantidad ${qty} · <b>${money(p.precio*qty)}</b>`;
   const n=cart.reduce((a,c)=>a+c.qty,0);
-  $("#addedCount").textContent=`Tenés ${n} ${n===1?"prenda":"prendas"} en tu carrito`;
+  $("#addedCount").textContent=`Tenés ${n} ${n===1?"producto":"productos"} en tu carrito`;
   const box=$("#added"); box.classList.remove("on"); void box.offsetWidth; box.classList.add("on");
   const btn=$("#cartBtn"); btn.classList.remove("bump"); void btn.offsetWidth; btn.classList.add("bump");
   clearTimeout(at); at=setTimeout(hideAdded,5000);
@@ -944,7 +1091,7 @@ let tt;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on
 /* =========================================================
    EVENTOS
    ========================================================= */
-function goCat(c){state.cat=c;state.q="";$("#searchInput").value="";renderGrid();
+function goCat(c){track("ver_seccion",{seccion:c});state.cat=c;state.q="";$("#searchInput").value="";renderGrid();
   $("#mainNav").classList.remove("open");$("#ddProductos").classList.remove("open");
   document.getElementById("catalogo").scrollIntoView({behavior:"smooth"})}
 document.addEventListener("click",e=>{
@@ -962,13 +1109,37 @@ document.addEventListener("click",e=>{
   else if(t.id==="goShop"){closeAll();goCat("Todos")}
   else if(t.hasAttribute("data-close")){$("#mainNav").classList.remove("open")}
 });
+document.addEventListener("click",e=>{
+  const a=e.target.closest("a"); if(!a) return;
+  if(a.id==="sendOrder"){const L=cartLines(),sub=L.reduce((x,c)=>x+c.qty*c.p.precio,0),tot=sub-evalCupon(cuponCode,sub).monto;
+    track("begin_checkout",{currency:"ARS",value:tot,items:L.map(c=>gaItem(c.p,c.size,c.qty))});
+    track("pedido_whatsapp",{value:tot,currency:"ARS",productos:L.reduce((x,c)=>x+c.qty,0)});}
+  else if(a.id==="encargoBtn"&&cur) track("encargo_whatsapp",{item_name:cur.nombre,talle:curSize});
+  else if(/whatsapp\.com/.test(a.href)) track("click_whatsapp",{ubicacion:a.id||a.dataset.wa||"otro"});
+  else if(/instagram\.com/.test(a.href)) track("click_instagram",{ubicacion:a.id||"otro"});
+  else if(/google\.com\/maps/.test(a.href)) track("click_como_llegar");
+},true);
+let searchT;
+function aplicarCupon(){
+  const code=$("#cuponInput").value.trim().toUpperCase(); if(!code){$("#cuponErr").textContent="Escribí tu código.";return}
+  const sub=cartLines().reduce((a,c)=>a+c.qty*c.p.precio,0), r=evalCupon(code,sub);
+  if(!r.cupon||r.error){$("#cuponErr").textContent=r.error;track("cupon_invalido",{codigo:code});return}
+  cuponCode=code;try{localStorage.setItem("trendy_cupon",code)}catch(e){}
+  $("#cuponInput").value="";renderCart();
+  if(r.monto>0){toast(`Cupón ${code} aplicado: −${money(r.monto)}`);track("cupon_aplicado",{codigo:code,descuento:r.monto})}
+}
+$("#cuponBtn").onclick=aplicarCupon;
+$("#cuponInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();aplicarCupon()}});
+$("#cuponInput").addEventListener("input",()=>{$("#cuponErr").textContent=""});
+$("#cuponQuitar").onclick=()=>{cuponCode="";try{localStorage.removeItem("trendy_cupon")}catch(e){};$("#cuponErr").textContent="";renderCart()};
 $("#gPrev").onclick=()=>setImg(curImg-1);
 $("#gNext").onclick=()=>setImg(curImg+1);
 $("#qMinus").onclick=()=>{curQty=Math.max(1,curQty-1);$("#hint").textContent="";updateQtyUI()};
 $("#qPlus").onclick=()=>{
   if(!curSize){$("#hint").textContent="Elegí un talle primero.";return}
   const max=disponible(cur,curSize);
-  if(curQty>=max){$("#hint").textContent=max===1?"Hay una sola unidad de este talle.":`Solo hay ${max} unidades disponibles de este talle.`;return}
+  const dt=cur.sinTalle?"":" de este talle";
+  if(curQty>=max){$("#hint").textContent=max===1?`Hay una sola unidad${dt}.`:`Solo hay ${max} unidades disponibles${dt}.`;return}
   curQty++;updateQtyUI()};
 $("#addBtn").onclick=addToCart;
 $("#modalClose").onclick=closeAll;
@@ -979,7 +1150,8 @@ $("#drawerClose").onclick=closeAll;
 $("#menuBtn").onclick=()=>$("#mainNav").classList.toggle("open");
 $("#ddBtn").onclick=()=>$("#ddProductos").classList.toggle("open");
 $("#searchBtn").onclick=()=>{const b=$("#searchBar");b.classList.toggle("open");if(b.classList.contains("open"))setTimeout(()=>$("#searchInput").focus(),200)};
-$("#searchInput").addEventListener("input",e=>{state.q=e.target.value.trim();state.cat="Todos";renderGrid()});
+$("#searchInput").addEventListener("input",e=>{state.q=e.target.value.trim();state.cat="Todos";renderGrid();
+  clearTimeout(searchT); if(state.q.length>2) searchT=setTimeout(()=>track("search",{search_term:state.q}),1500)});
 $("#searchInput").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("catalogo").scrollIntoView({behavior:"smooth"})});
 $("#sizeFilter").onchange=e=>{state.size=e.target.value;renderGrid()};
 $("#sortSel").onchange=e=>{state.sort=e.target.value;renderGrid()};
@@ -991,7 +1163,7 @@ window.addEventListener("scroll",()=>$("header.site").classList.toggle("compact"
 (()=>{let x0=null;const g=$(".gallery .main");g.addEventListener("touchstart",e=>x0=e.touches[0].clientX,{passive:true});
 g.addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40)setImg(curImg+(dx<0?1:-1));x0=null})})();
 
-(async()=>{PRODUCTS=await loadProducts();renderStatic();renderGrid();renderCart()})();
+(async()=>{[PRODUCTS,CUPONES]=await Promise.all([loadProducts(),loadCupones()]);renderStatic();renderGrid();renderCart()})();
 </script>
 </body>
 </html>
