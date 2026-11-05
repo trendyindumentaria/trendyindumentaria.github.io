@@ -661,7 +661,7 @@ const CONFIG = {
   // Mientras esté vacío se usan los productos de ejemplo de abajo.
   sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRebpf8r6xx1xze75vMvfPWE9ZJBPWxXCL1ftLltYOlZ_1yOVEn9CN7W5znIel-IAu4BtnHLvBMiZEx/pub?gid=0&single=true&output=csv",
   // Google Analytics: ID de medición (G-XXXXXXX). Vacío = sin estadísticas
-  gaId: "G-XHE7K7E3VZ",
+  gaId: "G-KE7B1Q7X24",
   // Link CSV de la hoja "Cupones" publicada. Vacío = sin cupones
   cuponesCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRebpf8r6xx1xze75vMvfPWE9ZJBPWxXCL1ftLltYOlZ_1yOVEn9CN7W5znIel-IAu4BtnHLvBMiZEx/pub?gid=217773205&single=true&output=csv",
   // Carpeta donde se suben las fotos (junto a esta página)
@@ -758,13 +758,14 @@ document.addEventListener("error",e=>{const t=e.target;if(t&&t.tagName==="IMG"&&
    ESTADÍSTICAS (Google Analytics)
    ========================================================= */
 (function(){
-  if(!CONFIG.gaId) return;
+  const ids=String(CONFIG.gaId||"").split(",").map(x=>x.trim()).filter(Boolean);
+  if(!ids.length) return;
   const sc=document.createElement("script"); sc.async=true;
-  sc.src="https://www.googletagmanager.com/gtag/js?id="+encodeURIComponent(CONFIG.gaId);
+  sc.src="https://www.googletagmanager.com/gtag/js?id="+encodeURIComponent(ids[0]);
   document.head.appendChild(sc);
   window.dataLayer=window.dataLayer||[];
   window.gtag=function(){dataLayer.push(arguments)};
-  gtag("js",new Date()); gtag("config",CONFIG.gaId);
+  gtag("js",new Date()); ids.forEach(id=>gtag("config",id));
 })();
 function track(ev,params){try{if(window.gtag) gtag("event",ev,params||{})}catch(e){}}
 function gaItem(p,size,qty){return {item_id:p.id,item_name:p.nombre,item_category:p.categoria,item_category2:p.subcategoria||undefined,item_variant:p.sinTalle?undefined:size,price:p.precio,quantity:qty||1}}
