@@ -937,10 +937,10 @@ function renderGrid(){
   $("#resultInfo").textContent=(state.q?`Resultados para «${state.q}» · `:"")+list.length+(list.length===1?" producto":" productos");
   $("#grid").innerHTML=list.length?list.map(p=>{
     const units=Object.values(p.stock).reduce((a,n)=>a+n,0);
-    const last=p.encargo?'<span class="badge pedido">A pedido</span>':p.talles[0]==="Único"&&units===1?'<span class="badge dark">Prenda única</span>':units===1?'<span class="badge dark">Última unidad</span>':p.talles.length===1?'<span class="badge dark">Último talle</span>':p.nuevo?'<span class="badge">Nuevo</span>':"";
+    const last=p.encargo?'<span class="badge pedido">A pedido</span>':p.nuevo?'<span class="badge">Nuevo</span>':"";
     return `<button class="card" data-id="${esc(p.id)}">
       <div class="ph">${last}<img src="${p.fotos[0]}" alt="${esc(p.nombre)}" loading="lazy">${p.fotos[1]?`<img class="alt" src="${p.fotos[1]}" alt="" loading="lazy">`:""}<span class="quick">${p.encargo?"Encargar":"Ver detalle"}</span></div>
-      <h3>${esc(p.nombre)}</h3><div class="price">${money(p.precio)}</div><div class="sizes">${p.encargo?`A pedido · Talles ${esc(rangoTalles(p.talles))}`:p.sinTalle?(units===1?"Última unidad":"Disponible"):"Talles: "+p.talles.map(esc).join(" · ")}</div>
+      <h3>${esc(p.nombre)}</h3><div class="price">${money(p.precio)}</div><div class="sizes">${p.encargo?`A pedido · Talles ${esc(rangoTalles(p.talles))}`:p.sinTalle?"Disponible":"Talles: "+p.talles.map(esc).join(" · ")}</div>
     </button>`}).join(""):(LOAD_ERROR?`<div class="empty" style="grid-column:1/-1">No pudimos cargar el catálogo. Probá recargar la página en unos minutos o escribinos por WhatsApp.</div>`:!PRODUCTS.length?`<div class="empty" style="grid-column:1/-1">Estamos cargando nuevas prendas. ¡Volvé pronto!</div>`:(`<div class="empty" style="grid-column:1/-1">No encontramos prendas con esos filtros.<br><br><button class="btn btn-light" id="resetF">Ver todo</button></div>`));
 }
 
@@ -958,7 +958,7 @@ function openProduct(id){
   $("#pDesc").textContent=cur.descripcion||"";
   $("#pFeat").innerHTML=cur.caract.map(([k,v])=>`<li><b>${esc(k)}</b>${esc(v)}</li>`).join("");
   $("#pFeat").style.display=cur.caract.length?"":"none";
-  $("#pSizeNote").textContent=cur.encargo?"Elegí tu talle":cur.talles.length===1?(cur.talles[0]==="Único"?"Talle único":"Último talle disponible"):"Elegí tu talle";
+  $("#pSizeNote").textContent=cur.encargo?"Elegí tu talle":cur.talles.length===1?(cur.talles[0]==="Único"?"Talle único":""):"Elegí tu talle";
   $("#pSizes").innerHTML=cur.talles.map(t=>`<button class="size-btn${t===curSize?" on":""}" data-size="${esc(t)}">${esc(t)}</button>`).join("");
   $("#hint").textContent=""; updateQtyUI();
   $("#thumbs").innerHTML=cur.fotos.map((f,i)=>`<button data-img="${i}"><img src="${f}" alt=""></button>`).join("");
