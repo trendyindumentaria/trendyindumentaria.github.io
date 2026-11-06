@@ -315,6 +315,16 @@ input::placeholder{color:#9b908a;opacity:1}
 .ship-bar{height:4px;background:var(--line);overflow:hidden}
 .ship-bar i{display:block;height:100%;background:var(--rose-deep);transition:width .4s}
 .ship.done p{color:#1f7a3f}
+/* ---------- Colores ---------- */
+.swatches{display:flex;gap:5px;align-items:center;margin-top:6px}
+.swatches i{width:12px;height:12px;border-radius:50%;border:1px solid rgba(0,0,0,.18);display:inline-block}
+.swatches small{font-size:.7rem;color:var(--taupe)}
+.color-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.color-btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px 0 8px;border:1px solid var(--line);background:var(--white);font-size:.86rem;transition:all .15s}
+.color-btn i{width:22px;height:22px;border-radius:50%;border:1px solid rgba(0,0,0,.18)}
+.color-btn:hover{border-color:var(--ink)}
+.color-btn.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+
 /* ---------- A pedido ---------- */
 .badge.pedido{background:#DAD0C7;color:#3B332C}
 .encargos{background:#F6F1EC;border-top:1px solid var(--line);padding:64px 0}
@@ -586,6 +596,8 @@ input::placeholder{color:#9b908a;opacity:1}
       <div class="price" id="pPrice"></div>
       <p class="desc" id="pDesc"></p>
       <ul class="feat" id="pFeat"></ul>
+      <div class="label" id="colorLabel">Color <span id="pColorName"></span></div>
+      <div class="color-row" id="pColors"></div>
       <div class="label" id="sizeLabel">Talle <span id="pSizeNote"></span></div>
       <div class="size-row" id="pSizes"></div>
       <div id="buyBox">
@@ -691,32 +703,35 @@ const TALLES_PEDIDO = "35,36,37,38,39,40";
    descripcion · caracteristicas · fotos · nuevo · disponible
    ========================================================= */
 const EJEMPLO = [
-  {id:"A01",nombre:"Cartera Bandolera Negra",categoria:"Accesorios",subcategoria:"",precio:42000,talles:"2",descripcion:"Cartera de cuero ecológico con correa regulable y cierre metálico.",caracteristicas:"Material: Cuero ecológico; Color: Negro; Medidas: 24 × 16 cm",color:"#2A2A2A",nuevo:"si"},
-  {id:"A02",nombre:"Cinturón Hebilla Dorada",categoria:"Accesorios",subcategoria:"",precio:15500,talles:"1",descripcion:"Cinturón fino con hebilla dorada, ideal para marcar la cintura.",caracteristicas:"Material: Cuero ecológico; Color: Camel",color:"#B38B62"},
-  {id:"L01",nombre:"Agenda 2027 Tapa Dura",categoria:"Papelería",subcategoria:"",precio:19900,talles:"5",descripcion:"Agenda semanal 2027 con tapa dura, elástico y cinta señaladora.",caracteristicas:"Formato: A5; Hojas: 160; Diseño: Semana a la vista",color:"#E8C9C1",nuevo:"si"},
-  {id:"L02",nombre:"Libreta Lisa Beige",categoria:"Papelería",subcategoria:"",precio:8900,talles:"3",descripcion:"Libreta de hojas lisas con tapa de lino.",caracteristicas:"Formato: A6; Hojas: 96",color:"#D7C4A8"},
-  {id:"E01",nombre:"Zapatilla Urbana Beige",categoria:"Calzado",subcategoria:"Zapatillas",precio:71000,talles:"",descripcion:"Zapatilla de cuero ecológico con suela de goma. Modelo a pedido.",caracteristicas:"Material: Cuero ecológico; Color: Beige; Suela: Goma",color:"#CDB79E",disponible:"pedido"},
-  {id:"R01",nombre:"Remera Lino Básica",categoria:"Ropa",subcategoria:"Remeras",precio:18500,talles:"S,M,L",descripcion:"Remera de lino de corte recto, fresca y fácil de combinar.",caracteristicas:"Tela: Lino; Color: Crudo; Calce: Recto",color:"#E9E1D4",nuevo:"si"},
-  {id:"R02",nombre:"Remera Morley Negra",categoria:"Ropa",subcategoria:"Remeras",precio:15900,talles:"S,M,L,XL",descripcion:"Básica de morley con caída suave, ideal para usar sola o debajo de un blazer.",caracteristicas:"Tela: Morley; Color: Negro; Calce: Al cuerpo",color:"#2A2A2A"},
-  {id:"R03",nombre:"Remerón Oversize Arena",categoria:"Ropa",subcategoria:"Remeras",precio:21000,talles:"Único",descripcion:"Remerón amplio de algodón peinado. Prenda única.",caracteristicas:"Tela: Algodón; Color: Arena; Calce: Oversize",color:"#CDB79E",nuevo:"si"},
-  {id:"C01",nombre:"Camisa Satén Champagne",categoria:"Ropa",subcategoria:"Camisas y Blusas",precio:32500,talles:"S,M",descripcion:"Camisa de satén con brillo sutil. Perfecta para eventos o una salida.",caracteristicas:"Tela: Satén; Color: Champagne; Calce: Suelto",color:"#E4CFB2",nuevo:"si"},
-  {id:"C02",nombre:"Camisa Blanca Clásica",categoria:"Ropa",subcategoria:"Camisas y Blusas",precio:28900,talles:"S,M,L",descripcion:"La camisa blanca que no puede faltar. Algodón con un toque de elastano.",caracteristicas:"Tela: Poplín; Color: Blanco; Calce: Regular",color:"#F3F1EC"},
-  {id:"C03",nombre:"Camisa Rayada Celeste",categoria:"Ropa",subcategoria:"Camisas y Blusas",precio:27500,talles:"M",descripcion:"Camisa a rayas finas, para un look relajado. Última unidad.",caracteristicas:"Tela: Algodón; Color: Celeste/Blanco; Calce: Oversize",color:"#B9CCDB"},
-  {id:"P01",nombre:"Pantalón Sastrero Negro",categoria:"Ropa",subcategoria:"Pantalones",precio:36900,talles:"36:1,38:2,40:3,42:1",descripcion:"Pantalón de tiro alto con pinzas y pierna ancha. Estiliza la figura.",caracteristicas:"Tela: Crepe; Color: Negro; Tiro: Alto",color:"#1F1F1F",nuevo:"si"},
-  {id:"P02",nombre:"Jean Wide Leg",categoria:"Ropa",subcategoria:"Pantalones",precio:39500,talles:"36,38,40",descripcion:"Jean rígido de pierna ancha y tiro alto.",caracteristicas:"Tela: Denim; Color: Azul medio; Tiro: Alto",color:"#6F88A6"},
-  {id:"P03",nombre:"Pantalón Lino Beige",categoria:"Ropa",subcategoria:"Pantalones",precio:33000,talles:"S,M,L",descripcion:"Pantalón de lino con cintura elastizada, fresco para el verano.",caracteristicas:"Tela: Lino; Color: Beige; Tiro: Medio",color:"#D7C4A8"},
-  {id:"S01",nombre:"Short Sastrero Crudo",categoria:"Ropa",subcategoria:"Shorts",precio:22500,talles:"S,M,L",descripcion:"Short de vestir con pinzas y bolsillos.",caracteristicas:"Tela: Gabardina; Color: Crudo; Tiro: Alto",color:"#EAE2D3",nuevo:"si"},
-  {id:"S02",nombre:"Short de Jean",categoria:"Ropa",subcategoria:"Shorts",precio:19900,talles:"36,38",descripcion:"Short de jean con ruedo desflecado.",caracteristicas:"Tela: Denim; Color: Celeste; Tiro: Alto",color:"#9DB3CB"},
-  {id:"J01",nombre:"Conjunto Deportivo Oliva",categoria:"Ropa",subcategoria:"Conjuntos",precio:54900,talles:"S,M,L",descripcion:"Campera y pantalón con franjas laterales. Cómodo y con onda.",caracteristicas:"Tela: Microfibra; Color: Verde oliva; Incluye: Campera + pantalón",color:"#6B6A4E",nuevo:"si"},
-  {id:"J02",nombre:"Conjunto Lino Blanco",categoria:"Ropa",subcategoria:"Conjuntos",precio:58500,talles:"S,M",descripcion:"Top y pantalón de lino. Elegancia simple para el verano.",caracteristicas:"Tela: Lino; Color: Blanco; Incluye: Top + pantalón",color:"#F1EEE7"},
-  {id:"I01",nombre:"Tapado Paño Camel",categoria:"Ropa",subcategoria:"Abrigos",precio:89000,talles:"M,L",descripcion:"Tapado largo de paño, cruzado. Abrigado y elegante.",caracteristicas:"Tela: Paño; Color: Camel; Largo: Bajo rodilla",color:"#B38B62"},
-  {id:"T01",nombre:"Blazer Gris Melange",categoria:"Ropa",subcategoria:"Sastrería",precio:61000,talles:"S",descripcion:"Blazer entallado con forrería. Prenda única.",caracteristicas:"Tela: Lanilla; Color: Gris; Calce: Entallado",color:"#9A9794"},
-  {id:"T02",nombre:"Blazer Negro Oversize",categoria:"Ropa",subcategoria:"Sastrería",precio:68500,talles:"S,M,L",descripcion:"Blazer amplio con hombreras suaves y botón único. Eleva cualquier look.",caracteristicas:"Tela: Crepe; Color: Negro; Calce: Oversize",color:"#1E1E1E",nuevo:"si"},
-  {id:"T03",nombre:"Chaleco Sastrero Arena",categoria:"Ropa",subcategoria:"Sastrería",precio:34900,talles:"S,M",descripcion:"Chaleco de vestir con botones, para usar solo o en capas.",caracteristicas:"Tela: Lino; Color: Arena; Calce: Entallado",color:"#CDB79E"},
-  {id:"I02",nombre:"Campera Puffer Negra",categoria:"Ropa",subcategoria:"Abrigos",precio:79000,talles:"M,L",descripcion:"Campera inflada liviana con capucha desmontable.",caracteristicas:"Tela: Nylon; Color: Negro; Relleno: Guata",color:"#2A2A2A"},
-  {id:"Z01",nombre:"Zapatilla Urbana Blanca",categoria:"Calzado",subcategoria:"Zapatillas",precio:64900,talles:"35,36,37,38,39,40",descripcion:"Zapatilla de cuero ecológico con plataforma liviana.",caracteristicas:"Material: Cuero ecológico; Color: Blanco; Suela: Goma",color:"#F2F0EC",nuevo:"si"},
-  {id:"Z02",nombre:"Zapatilla Negra Plataforma",categoria:"Calzado",subcategoria:"Zapatillas",precio:67500,talles:"36,37,38,39",descripcion:"Clásica negra con plataforma de 4 cm.",caracteristicas:"Material: Cuero ecológico; Color: Negro; Suela: Goma",color:"#262626"},
-  {id:"Z03",nombre:"Zapatilla Nude",categoria:"Calzado",subcategoria:"Zapatillas",precio:62000,talles:"37,38",descripcion:"Zapatilla en tono nude, suave y femenina.",caracteristicas:"Material: Gamuza ecológica; Color: Nude; Suela: Goma",color:"#D9B9A4"}
+  {id:"A01",nombre:"Cartera Bandolera Negra",categoria:"Accesorios",subcategoria:"",precio:42000,talles:"2",descripcion:"Cartera de cuero ecológico con correa regulable y cierre metálico.",caracteristicas:"Material: Cuero ecológico; Color: Negro; Medidas: 24 × 16 cm",tono:"#2A2A2A",nuevo:"si"},
+  {id:"A02",nombre:"Cinturón Hebilla Dorada",categoria:"Accesorios",subcategoria:"",precio:15500,talles:"1",descripcion:"Cinturón fino con hebilla dorada, ideal para marcar la cintura.",caracteristicas:"Material: Cuero ecológico; Color: Camel",tono:"#B38B62"},
+  {id:"L01",nombre:"Agenda 2027 Tapa Dura",categoria:"Papelería",subcategoria:"",precio:19900,talles:"5",descripcion:"Agenda semanal 2027 con tapa dura, elástico y cinta señaladora.",caracteristicas:"Formato: A5; Hojas: 160; Diseño: Semana a la vista",tono:"#E8C9C1",nuevo:"si"},
+  {id:"L02",nombre:"Libreta Lisa Beige",categoria:"Papelería",subcategoria:"",precio:8900,talles:"3",descripcion:"Libreta de hojas lisas con tapa de lino.",caracteristicas:"Formato: A6; Hojas: 96",tono:"#D7C4A8"},
+  {id:"E01",nombre:"Zapatilla Urbana Beige",categoria:"Calzado",subcategoria:"Zapatillas",precio:71000,talles:"",descripcion:"Zapatilla de cuero ecológico con suela de goma. Modelo a pedido.",caracteristicas:"Material: Cuero ecológico; Color: Beige; Suela: Goma",tono:"#CDB79E",disponible:"pedido"},
+  {id:"R01",nombre:"Remera Lino Básica",categoria:"Ropa",subcategoria:"Remeras",precio:18500,talles:"S,M,L",descripcion:"Remera de lino de corte recto, fresca y fácil de combinar.",caracteristicas:"Tela: Lino; Color: Crudo; Calce: Recto",tono:"#E9E1D4",nuevo:"si"},
+  {nombre:"Remera Básica Algodón",categoria:"Ropa",subcategoria:"Remeras",precio:17500,talles:"S,M",color:"Negro",descripcion:"Remera de algodón peinado, cuello redondo. Disponible en varios colores.",caracteristicas:"Tela: Algodón; Calce: Regular",nuevo:"si"},
+  {nombre:"Remera Básica Algodón",categoria:"Ropa",subcategoria:"Remeras",precio:17500,talles:"M:2,L",color:"Blanco"},
+  {nombre:"Remera Básica Algodón",categoria:"Ropa",subcategoria:"Remeras",precio:17500,talles:"S",color:"Rosa"},
+  {id:"R02",nombre:"Remera Morley Negra",categoria:"Ropa",subcategoria:"Remeras",precio:15900,talles:"S,M,L,XL",descripcion:"Básica de morley con caída suave, ideal para usar sola o debajo de un blazer.",caracteristicas:"Tela: Morley; Color: Negro; Calce: Al cuerpo",tono:"#2A2A2A"},
+  {id:"R03",nombre:"Remerón Oversize Arena",categoria:"Ropa",subcategoria:"Remeras",precio:21000,talles:"Único",descripcion:"Remerón amplio de algodón peinado. Prenda única.",caracteristicas:"Tela: Algodón; Color: Arena; Calce: Oversize",tono:"#CDB79E",nuevo:"si"},
+  {id:"C01",nombre:"Camisa Satén Champagne",categoria:"Ropa",subcategoria:"Camisas y Blusas",precio:32500,talles:"S,M",descripcion:"Camisa de satén con brillo sutil. Perfecta para eventos o una salida.",caracteristicas:"Tela: Satén; Color: Champagne; Calce: Suelto",tono:"#E4CFB2",nuevo:"si"},
+  {id:"C02",nombre:"Camisa Blanca Clásica",categoria:"Ropa",subcategoria:"Camisas y Blusas",precio:28900,talles:"S,M,L",descripcion:"La camisa blanca que no puede faltar. Algodón con un toque de elastano.",caracteristicas:"Tela: Poplín; Color: Blanco; Calce: Regular",tono:"#F3F1EC"},
+  {id:"C03",nombre:"Camisa Rayada Celeste",categoria:"Ropa",subcategoria:"Camisas y Blusas",precio:27500,talles:"M",descripcion:"Camisa a rayas finas, para un look relajado. Última unidad.",caracteristicas:"Tela: Algodón; Color: Celeste/Blanco; Calce: Oversize",tono:"#B9CCDB"},
+  {id:"P01",nombre:"Pantalón Sastrero Negro",categoria:"Ropa",subcategoria:"Pantalones",precio:36900,talles:"36:1,38:2,40:3,42:1",descripcion:"Pantalón de tiro alto con pinzas y pierna ancha. Estiliza la figura.",caracteristicas:"Tela: Crepe; Color: Negro; Tiro: Alto",tono:"#1F1F1F",nuevo:"si"},
+  {id:"P02",nombre:"Jean Wide Leg",categoria:"Ropa",subcategoria:"Pantalones",precio:39500,talles:"36,38,40",descripcion:"Jean rígido de pierna ancha y tiro alto.",caracteristicas:"Tela: Denim; Color: Azul medio; Tiro: Alto",tono:"#6F88A6"},
+  {id:"P03",nombre:"Pantalón Lino Beige",categoria:"Ropa",subcategoria:"Pantalones",precio:33000,talles:"S,M,L",descripcion:"Pantalón de lino con cintura elastizada, fresco para el verano.",caracteristicas:"Tela: Lino; Color: Beige; Tiro: Medio",tono:"#D7C4A8"},
+  {id:"S01",nombre:"Short Sastrero Crudo",categoria:"Ropa",subcategoria:"Shorts",precio:22500,talles:"S,M,L",descripcion:"Short de vestir con pinzas y bolsillos.",caracteristicas:"Tela: Gabardina; Color: Crudo; Tiro: Alto",tono:"#EAE2D3",nuevo:"si"},
+  {id:"S02",nombre:"Short de Jean",categoria:"Ropa",subcategoria:"Shorts",precio:19900,talles:"36,38",descripcion:"Short de jean con ruedo desflecado.",caracteristicas:"Tela: Denim; Color: Celeste; Tiro: Alto",tono:"#9DB3CB"},
+  {id:"J01",nombre:"Conjunto Deportivo Oliva",categoria:"Ropa",subcategoria:"Conjuntos",precio:54900,talles:"S,M,L",descripcion:"Campera y pantalón con franjas laterales. Cómodo y con onda.",caracteristicas:"Tela: Microfibra; Color: Verde oliva; Incluye: Campera + pantalón",tono:"#6B6A4E",nuevo:"si"},
+  {id:"J02",nombre:"Conjunto Lino Blanco",categoria:"Ropa",subcategoria:"Conjuntos",precio:58500,talles:"S,M",descripcion:"Top y pantalón de lino. Elegancia simple para el verano.",caracteristicas:"Tela: Lino; Color: Blanco; Incluye: Top + pantalón",tono:"#F1EEE7"},
+  {id:"I01",nombre:"Tapado Paño Camel",categoria:"Ropa",subcategoria:"Abrigos",precio:89000,talles:"M,L",descripcion:"Tapado largo de paño, cruzado. Abrigado y elegante.",caracteristicas:"Tela: Paño; Color: Camel; Largo: Bajo rodilla",tono:"#B38B62"},
+  {id:"T01",nombre:"Blazer Gris Melange",categoria:"Ropa",subcategoria:"Sastrería",precio:61000,talles:"S",descripcion:"Blazer entallado con forrería. Prenda única.",caracteristicas:"Tela: Lanilla; Color: Gris; Calce: Entallado",tono:"#9A9794"},
+  {id:"T02",nombre:"Blazer Negro Oversize",categoria:"Ropa",subcategoria:"Sastrería",precio:68500,talles:"S,M,L",descripcion:"Blazer amplio con hombreras suaves y botón único. Eleva cualquier look.",caracteristicas:"Tela: Crepe; Color: Negro; Calce: Oversize",tono:"#1E1E1E",nuevo:"si"},
+  {id:"T03",nombre:"Chaleco Sastrero Arena",categoria:"Ropa",subcategoria:"Sastrería",precio:34900,talles:"S,M",descripcion:"Chaleco de vestir con botones, para usar solo o en capas.",caracteristicas:"Tela: Lino; Color: Arena; Calce: Entallado",tono:"#CDB79E"},
+  {id:"I02",nombre:"Campera Puffer Negra",categoria:"Ropa",subcategoria:"Abrigos",precio:79000,talles:"M,L",descripcion:"Campera inflada liviana con capucha desmontable.",caracteristicas:"Tela: Nylon; Color: Negro; Relleno: Guata",tono:"#2A2A2A"},
+  {id:"Z01",nombre:"Zapatilla Urbana Blanca",categoria:"Calzado",subcategoria:"Zapatillas",precio:64900,talles:"35,36,37,38,39,40",descripcion:"Zapatilla de cuero ecológico con plataforma liviana.",caracteristicas:"Material: Cuero ecológico; Color: Blanco; Suela: Goma",tono:"#F2F0EC",nuevo:"si"},
+  {id:"Z02",nombre:"Zapatilla Negra Plataforma",categoria:"Calzado",subcategoria:"Zapatillas",precio:67500,talles:"36,37,38,39",descripcion:"Clásica negra con plataforma de 4 cm.",caracteristicas:"Material: Cuero ecológico; Color: Negro; Suela: Goma",tono:"#262626"},
+  {id:"Z03",nombre:"Zapatilla Nude",categoria:"Calzado",subcategoria:"Zapatillas",precio:62000,talles:"37,38",descripcion:"Zapatilla en tono nude, suave y femenina.",caracteristicas:"Material: Gamuza ecológica; Color: Nude; Suela: Goma",tono:"#D9B9A4"}
 ];
 
 /* =========================================================
@@ -768,7 +783,7 @@ document.addEventListener("error",e=>{const t=e.target;if(t&&t.tagName==="IMG"&&
   gtag("js",new Date()); ids.forEach(id=>gtag("config",id));
 })();
 function track(ev,params){try{if(window.gtag) gtag("event",ev,params||{})}catch(e){}}
-function gaItem(p,size,qty){return {item_id:p.id,item_name:p.nombre,item_category:p.categoria,item_category2:p.subcategoria||undefined,item_variant:p.sinTalle?undefined:size,price:p.precio,quantity:qty||1}}
+function gaItem(p,size,qty){return {item_id:p.id,item_name:p.nombre,item_category:p.categoria,item_category2:p.subcategoria||undefined,item_variant:size?varTxt(p,size)||undefined:undefined,price:p.precio,quantity:qty||1}}
 
 /* =========================================================
    ESTADO
@@ -785,13 +800,23 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const slug=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 function parsePrice(v){let t=String(v??"").trim().replace(/[,.]\d{1,2}$/,"");return Number(t.replace(/[^\d]/g,""))||0}
 function photoUrl(f){return /^(https?:|data:)/i.test(f)?f:CONFIG.carpetaFotos+encodeURI(f)}
+const COLORES={negro:"#1C1C1C",blanco:"#FFFFFF",crudo:"#EDE6D6",natural:"#EDE6D6",beige:"#D8C3A5",arena:"#CDB79E",nude:"#D9B9A4",camel:"#B38B62",
+  "marron":"#6B4A35",chocolate:"#4E3326",gris:"#9A9794",topo:"#8B7D72",azul:"#2F4A7A",marino:"#1F2A44",celeste:"#9DC3E6",jean:"#4A6283",verde:"#4E7A55",
+  oliva:"#6B6A4E",militar:"#5B5E3F",rojo:"#B3261E",bordo:"#6D1F2B",rosa:"#E8B4BC",fucsia:"#C2185B",lila:"#B9A6D3",violeta:"#6A4C93",amarillo:"#E8C547",
+  mostaza:"#C9A227",naranja:"#E07B39",coral:"#F08A75",dorado:"#C9A44C",plateado:"#C0C0C0",terracota:"#B5643E",khaki:"#BDB08A",caqui:"#BDB08A",salmon:"#F2A38D"};
+function colorHex(name){const n=String(name||"");const h=n.match(/#[0-9a-f]{6}\b/i);if(h)return h[0];
+  const k=n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");let best=null;for(const w in COLORES){if(k.includes(w)&&(!best||w.length>best.length))best=w}return best?COLORES[best]:"#CDB79E"}
+const colorLabel=n=>String(n||"").replace(/#[0-9a-f]{6}\b/i,"").trim();
+const sizeOf=k=>String(k).includes("|")?String(k).split("|")[1]:String(k);
+const colorOf=k=>String(k).includes("|")?String(k).split("|")[0]:"";
+function varTxt(p,k,sep){const c=colorOf(k),s=sizeOf(k);return [c,p.sinTalle?"":"Talle "+s].filter(Boolean).join(sep||" · ")}
 function normalize(list){
   const seen={};
-  return list.filter(p=>String(p.nombre||"").trim()&&String(p.disponible??"si").trim().toLowerCase()!=="no").map((p,i)=>{
+  const rows=list.filter(p=>String(p.nombre||"").trim()&&String(p.disponible??"si").trim().toLowerCase()!=="no").map((p,i)=>{
     const encargo=String(p.disponible||"").trim().toLowerCase()==="pedido";
     let tRaw=String(p.talles||"").trim(); if(encargo&&!tRaw) tRaw=TALLES_PEDIDO;
     const sinTalle=/^\d*$/.test(tRaw);
-    let id=String(p.id||"").trim()||slug(p.nombre); if(seen[id]) id+="-"+(++seen[id]); else seen[id]=1;
+    const color=colorLabel(p.color);
     const stock={};
     tRaw.split(/[,|;]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{
       const m=s.match(/^(.+?)\s*(?::|\()\s*(\d+)\s*\)?$/); const t=(m?m[1]:s).trim(), n=m?parseInt(m[2],10):1;
@@ -800,12 +825,35 @@ function normalize(list){
     if(sinTalle){const n=tRaw===""?(encargo?1:0):parseInt(tRaw,10);Object.keys(stock).forEach(k=>delete stock[k]);if(n>0||encargo)stock["-"]=n||1}
     if(encargo) Object.keys(stock).forEach(k=>stock[k]=99);
     const talles=Object.keys(stock);
+    if(color) Object.keys(stock).forEach(k=>{stock[color+"|"+k]=stock[k];delete stock[k]});
     const precioN=parsePrice(p.precio);
     let fotos=String(p.fotos||"").split(/[,|;\n]/).map(s=>s.trim()).filter(Boolean).map(photoUrl);
-    if(!fotos.length) fotos=[0,1,2].map(v=>fakePhoto(p.subcategoria||p.categoria,p.color||"#CDB79E",v));
+    if(!fotos.length) fotos=[0,1,2].map(v=>fakePhoto(p.subcategoria||p.categoria,p.tono||(color?colorHex(p.color):"#CDB79E"),v));
     const caract=String(p.caracteristicas||"").split(";").map(s=>s.split(":")).filter(a=>a[0]&&a[0].trim()).map(a=>[a[0].trim(),(a.slice(1).join(":")||"").trim()]);
-    return {...p,id,nombre:String(p.nombre).trim(),categoria:String(p.categoria||"").trim(),subcategoria:String(p.subcategoria||"").trim(),precio:precioN,talles,stock,sinTalle,encargo,fotos,caract,nuevo:String(p.nuevo||"").trim().toLowerCase()==="si",orden:i};
+    return {...p,id:String(p.id||"").trim(),color,colorHex:colorHex(p.color),categoria:String(p.categoria||"").trim(),subcategoria:String(p.subcategoria||"").trim(),precio:precioN,talles,stock,sinTalle,encargo,fotos,caract,nuevo:String(p.nuevo||"").trim().toLowerCase()==="si",orden:i};
   }).filter(p=>p.talles.length);
+  // juntar las filas del mismo producto en distintos colores
+  const out=[],byName={};
+  rows.forEach(r=>{
+    r.nombre=String(r.nombre).trim();
+    const key=r.color?"c:"+slug(r.nombre)+"|"+slug(r.categoria):null;
+    const base=key&&byName[key];
+    if(base){
+      Object.assign(base.stock,r.stock);
+      base.talles=[...new Set([...base.talles,...r.talles])];
+      if(!base.colores.some(c=>c.nombre===r.color)) base.colores.push({nombre:r.color,hex:r.colorHex,fotos:r.fotos});
+      else base.colores.find(c=>c.nombre===r.color).fotos.push(...r.fotos);
+      base.fotos.push(...r.fotos); base.nuevo=base.nuevo||r.nuevo;
+      if(!base.descripcion&&r.descripcion) base.descripcion=r.descripcion;
+      if(!base.caract.length&&r.caract.length) base.caract=r.caract;
+      return;
+    }
+    const p={...r,fotos:[...r.fotos],colores:r.color?[{nombre:r.color,hex:r.colorHex,fotos:[...r.fotos]}]:[]};
+    if(key) byName[key]=p; out.push(p);
+  });
+  out.forEach(p=>{let id=p.id||slug(p.nombre); if(seen[id]) id+="-"+(++seen[id]); else seen[id]=1; p.id=id;
+    if(p.colores.length){p.caracteristicas=(p.caracteristicas||"")+" "+p.colores.map(c=>c.nombre).join(" ")}});
+  return out;
 }
 
 /* Lector de la planilla de Google (CSV) — se activa al poner sheetCsvUrl */
@@ -940,15 +988,15 @@ function renderGrid(){
     const last=p.encargo?'<span class="badge pedido">A pedido</span>':p.nuevo?'<span class="badge">Nuevo</span>':"";
     return `<button class="card" data-id="${esc(p.id)}">
       <div class="ph">${last}<img src="${p.fotos[0]}" alt="${esc(p.nombre)}" loading="lazy">${p.fotos[1]?`<img class="alt" src="${p.fotos[1]}" alt="" loading="lazy">`:""}<span class="quick">${p.encargo?"Encargar":"Ver detalle"}</span></div>
-      <h3>${esc(p.nombre)}</h3><div class="price">${money(p.precio)}</div><div class="sizes">${p.encargo?`A pedido · Talles ${esc(rangoTalles(p.talles))}`:p.sinTalle?"Disponible":"Talles: "+p.talles.map(esc).join(" · ")}</div>
+      <h3>${esc(p.nombre)}</h3>${p.colores.length>1?`<div class="swatches">${p.colores.slice(0,6).map(c=>`<i style="background:${c.hex}" title="${esc(c.nombre)}"></i>`).join("")}${p.colores.length>6?`<small>+${p.colores.length-6}</small>`:""}</div>`:""}<div class="price">${money(p.precio)}</div><div class="sizes">${p.encargo?`A pedido · Talles ${esc(rangoTalles(p.talles))}`:p.sinTalle?"Disponible":"Talles: "+p.talles.map(esc).join(" · ")}</div>
     </button>`}).join(""):(LOAD_ERROR?`<div class="empty" style="grid-column:1/-1">No pudimos cargar el catálogo. Probá recargar la página en unos minutos o escribinos por WhatsApp.</div>`:!PRODUCTS.length?`<div class="empty" style="grid-column:1/-1">Estamos cargando nuevas prendas. ¡Volvé pronto!</div>`:(`<div class="empty" style="grid-column:1/-1">No encontramos prendas con esos filtros.<br><br><button class="btn btn-light" id="resetF">Ver todo</button></div>`));
 }
 
 /* ---------- Ficha ---------- */
-let cur=null,curImg=0,curSize="",curQty=1;
+let cur=null,curImg=0,curSize="",curQty=1,curColor="",curFotos=[];
 function openProduct(id){
   cur=PRODUCTS.find(p=>p.id===id); if(!cur) return;
-  curImg=0;curQty=1;curSize=cur.talles.length===1?cur.talles[0]:"";
+  curImg=0;curQty=1;curSize="";curColor=cur.colores.length?cur.colores[0].nombre:"";
   $("#pCrumb").textContent=cur.categoria+(cur.subcategoria?" / "+cur.subcategoria:"")+(cur.encargo?" · A pedido":"");
   $("#sizeLabel").style.display=$("#pSizes").style.display=cur.sinTalle?"none":"";
   $("#buyBox").style.display=cur.encargo?"none":"";
@@ -958,14 +1006,32 @@ function openProduct(id){
   $("#pDesc").textContent=cur.descripcion||"";
   $("#pFeat").innerHTML=cur.caract.map(([k,v])=>`<li><b>${esc(k)}</b>${esc(v)}</li>`).join("");
   $("#pFeat").style.display=cur.caract.length?"":"none";
-  $("#pSizeNote").textContent=cur.encargo?"Elegí tu talle":cur.talles.length===1?(cur.talles[0]==="Único"?"Talle único":""):"Elegí tu talle";
-  $("#pSizes").innerHTML=cur.talles.map(t=>`<button class="size-btn${t===curSize?" on":""}" data-size="${esc(t)}">${esc(t)}</button>`).join("");
-  $("#hint").textContent=""; updateQtyUI();
-  $("#thumbs").innerHTML=cur.fotos.map((f,i)=>`<button data-img="${i}"><img src="${f}" alt=""></button>`).join("");
-  $("#gPrev").style.display=$("#gNext").style.display=cur.fotos.length>1?"":"none";
-  setImg(0); updateAsk();
+  $("#colorLabel").style.display=$("#pColors").style.display=cur.colores.length?"":"none";
+  $("#pColors").innerHTML=cur.colores.map(c=>`<button class="color-btn" data-color="${esc(c.nombre)}" title="${esc(c.nombre)}"><i style="background:${c.hex}"></i><span>${esc(c.nombre)}</span></button>`).join("");
+  $("#hint").textContent="";
+  selectColor(curColor,true);
   track("view_item",{currency:"ARS",value:cur.precio,items:[gaItem(cur)]});
   $("#modal").classList.add("on");$("#overlay").classList.add("on");document.body.style.overflow="hidden";
+}
+function fotoDe(p,k){const v=p.colores.find(c=>c.nombre===colorOf(k));return (v&&v.fotos[0])||p.fotos[0]}
+function renderSizes(){
+  const keys=Object.keys(cur.stock).filter(k=>colorOf(k)===curColor);
+  if(curSize&&!keys.includes(curSize)) curSize="";
+  if(keys.length===1) curSize=keys[0];
+  const sizes=keys.map(sizeOf);
+  $("#pSizeNote").textContent=cur.encargo?"Elegí tu talle":keys.length===1?(sizes[0]==="Único"?"Talle único":""):"Elegí tu talle";
+  $("#pSizes").innerHTML=keys.map(k=>`<button class="size-btn${k===curSize?" on":""}" data-size="${esc(k)}">${esc(sizeOf(k))}</button>`).join("");
+}
+function selectColor(name,first){
+  curColor=name||"";
+  document.querySelectorAll(".color-btn").forEach(b=>b.classList.toggle("on",b.dataset.color===curColor));
+  $("#pColorName").textContent=curColor;
+  const v=cur.colores.find(c=>c.nombre===curColor);
+  curFotos=v&&v.fotos.length?v.fotos:cur.fotos;
+  $("#thumbs").innerHTML=curFotos.map((f,i)=>`<button data-img="${i}"><img src="${f}" alt=""></button>`).join("");
+  $("#gPrev").style.display=$("#gNext").style.display=curFotos.length>1?"":"none";
+  renderSizes(); setImg(0); updateQtyUI(); updateAsk();
+  if(!first) $("#hint").textContent="";
 }
 function enCarrito(id,size){return cart.filter(c=>c.id===id&&c.size===size).reduce((a,c)=>a+c.qty,0)}
 function disponible(p,size){return Math.max(0,(p.stock[size]||0)-enCarrito(p.id,size))}
@@ -984,15 +1050,15 @@ function updateEncargo(){
   if(!cur||!cur.encargo) return;
   const a=$("#encargoBtn"), ok=!!curSize;
   a.setAttribute("aria-disabled",ok?"false":"true");
-  a.href=ok?waLink(`¡Hola Trendy! 👋🏻 Quiero encargar:\n\n• ${cur.nombre}${cur.sinTalle?"":" — Talle "+curSize} — ${money(cur.precio)}\n\n¿Cómo coordinamos la seña? ¡Gracias!`):"#";
+  a.href=ok?waLink(`¡Hola Trendy! 👋🏻 Quiero encargar:\n\n• ${cur.nombre} — ${varTxt(cur,curSize," — ")||"-"} — ${money(cur.precio)}\n\n¿Cómo coordinamos la seña? ¡Gracias!`):"#";
 }
 function setImg(i){
-  curImg=(i+cur.fotos.length)%cur.fotos.length;
-  $("#gMain").src=cur.fotos[curImg]; $("#gMain").alt=cur.nombre;
+  curImg=(i+curFotos.length)%curFotos.length;
+  $("#gMain").src=curFotos[curImg]; $("#gMain").alt=cur.nombre;
   document.querySelectorAll("#thumbs button").forEach((b,j)=>b.classList.toggle("on",j===curImg));
 }
 function updateAsk(){
-  $("#askBtn").href=waLink(`¡Hola Trendy! Quería consultar por: ${cur.nombre}${curSize&&!cur.sinTalle?" (talle "+curSize+")":""} — ${money(cur.precio)}`);
+  $("#askBtn").href=waLink(`¡Hola Trendy! Quería consultar por: ${cur.nombre}${curSize&&varTxt(cur,curSize)?" ("+varTxt(cur,curSize,", ").toLowerCase()+")":curColor?" ("+curColor.toLowerCase()+")":""} — ${money(cur.precio)}`);
 }
 function closeAll(){
   $("#modal").classList.remove("on");$("#drawer").classList.remove("on");$("#overlay").classList.remove("on");document.body.style.overflow="";
@@ -1036,8 +1102,8 @@ function renderCart(){
   $("#cartFoot").style.display=lines.length?"":"none";
   $("#cartBody").innerHTML=lines.length?lines.map(c=>`
     <div class="ci">
-      <img src="${c.p.fotos[0]}" alt="">
-      <div><h4>${esc(c.p.nombre)}</h4><small>${c.p.sinTalle?"":`Talle ${esc(c.size)} · `}${money(c.p.precio)} c/u</small>
+      <img src="${fotoDe(c.p,c.size)}" alt="">
+      <div><h4>${esc(c.p.nombre)}</h4><small>${varTxt(c.p,c.size)?esc(varTxt(c.p,c.size))+" · ":""}${money(c.p.precio)} c/u</small>
         <div class="qty"><button data-dec="${esc(c.key)}" aria-label="Menos">−</button><span>${c.qty}</span><button data-inc="${esc(c.key)}" aria-label="Más">+</button></div></div>
       <div class="right"><b>${money(c.qty*c.p.precio)}</b><button class="rm" data-rm="${esc(c.key)}">Quitar</button></div>
     </div>`).join(""):`<div class="cart-empty"><svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>Tu carrito está vacío.<br><br><button class="btn btn-light" id="goShop">Ver catálogo</button></div>`;
@@ -1048,7 +1114,7 @@ function updateOrderLink(lines=cartLines(),total,subtotal,cu){
   const name=$("#fName").value.trim(), del=$("#fDelivery").value, city=$("#fCity").value.trim(), pay=$("#fPay").value;
   $("#fCity").style.display=del==="Envío"?"":"none";
   let t="¡Hola Trendy! 👋🏻 Quiero hacer este pedido:\n\n";
-  t+=lines.map(c=>`• ${c.p.nombre}${c.p.sinTalle?"":" — Talle "+c.size} × ${c.qty} — ${money(c.qty*c.p.precio)}`).join("\n");
+  t+=lines.map(c=>`• ${c.p.nombre}${varTxt(c.p,c.size)?" — "+varTxt(c.p,c.size," — "):""} × ${c.qty} — ${money(c.qty*c.p.precio)}`).join("\n");
   if(cu&&cu.monto>0) t+=`\n\nSubtotal: ${money(subtotal)}\nCupón ${cu.cupon.codigo} (${cu.cupon.pct?cu.cupon.valor+"%":money(cu.cupon.valor)} off): −${money(cu.monto)}\n*Total: ${money(total)}*\n`;
   else t+=`\n\n*Total: ${money(total)}*\n`;
   t+=`\nNombre: ${name||"-"}`;
@@ -1072,9 +1138,9 @@ function openNow(){
 setInterval(openNow,60000);
 let at;
 function showAdded(p,size,qty){
-  $("#addedImg").src=p.fotos[0];
+  $("#addedImg").src=fotoDe(p,size);
   $("#addedName").textContent=p.nombre;
-  $("#addedInfo").innerHTML=`${p.sinTalle?"":`Talle ${esc(size)} · `}Cantidad ${qty} · <b>${money(p.precio*qty)}</b>`;
+  $("#addedInfo").innerHTML=`${varTxt(p,size)?esc(varTxt(p,size))+" · ":""}Cantidad ${qty} · <b>${money(p.precio*qty)}</b>`;
   const n=cart.reduce((a,c)=>a+c.qty,0);
   $("#addedCount").textContent=`Tenés ${n} ${n===1?"producto":"productos"} en tu carrito`;
   const box=$("#added"); box.classList.remove("on"); void box.offsetWidth; box.classList.add("on");
@@ -1096,11 +1162,12 @@ function goCat(c){track("ver_seccion",{seccion:c});state.cat=c;state.q="";$("#se
   $("#mainNav").classList.remove("open");$("#ddProductos").classList.remove("open");
   document.getElementById("catalogo").scrollIntoView({behavior:"smooth"})}
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-cat],[data-chip],.card,[data-size],[data-img],[data-inc],[data-dec],[data-rm],#resetF,#goShop,[data-close]");
+  const t=e.target.closest(".color-btn,[data-cat],[data-chip],.card,[data-size],[data-img],[data-inc],[data-dec],[data-rm],#resetF,#goShop,[data-close]");
   if(!t) return;
   if(t.dataset.cat){e.preventDefault();goCat(t.dataset.cat)}
   else if(t.dataset.chip){state.cat=t.dataset.chip;renderGrid()}
   else if(t.classList.contains("card")) openProduct(t.dataset.id);
+  else if(t.dataset.color!==undefined&&t.classList.contains("color-btn")){selectColor(t.dataset.color);updateEncargo()}
   else if(t.dataset.size){curSize=t.dataset.size;document.querySelectorAll(".size-btn").forEach(b=>b.classList.toggle("on",b===t));$("#hint").textContent="";updateQtyUI();updateAsk()}
   else if(t.dataset.img) setImg(+t.dataset.img);
   else if(t.dataset.inc) changeQty(t.dataset.inc,1);
@@ -1115,7 +1182,7 @@ document.addEventListener("click",e=>{
   if(a.id==="sendOrder"){const L=cartLines(),sub=L.reduce((x,c)=>x+c.qty*c.p.precio,0),tot=sub-evalCupon(cuponCode,sub).monto;
     track("begin_checkout",{currency:"ARS",value:tot,items:L.map(c=>gaItem(c.p,c.size,c.qty))});
     track("pedido_whatsapp",{value:tot,currency:"ARS",productos:L.reduce((x,c)=>x+c.qty,0)});}
-  else if(a.id==="encargoBtn"&&cur) track("encargo_whatsapp",{item_name:cur.nombre,talle:curSize});
+  else if(a.id==="encargoBtn"&&cur) track("encargo_whatsapp",{item_name:cur.nombre,variante:varTxt(cur,curSize)});
   else if(/whatsapp\.com/.test(a.href)) track("click_whatsapp",{ubicacion:a.id||a.dataset.wa||"otro"});
   else if(/instagram\.com/.test(a.href)) track("click_instagram",{ubicacion:a.id||"otro"});
   else if(/google\.com\/maps/.test(a.href)) track("click_como_llegar");
