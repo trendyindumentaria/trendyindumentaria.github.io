@@ -678,7 +678,9 @@ const CONFIG = {
   // Link CSV de la hoja "Cupones" publicada. Vacío = sin cupones
   cuponesCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRebpf8r6xx1xze75vMvfPWE9ZJBPWxXCL1ftLltYOlZ_1yOVEn9CN7W5znIel-IAu4BtnHLvBMiZEx/pub?gid=217773205&single=true&output=csv",
   // Carpeta donde se suben las fotos (junto a esta página)
-  carpetaFotos: "Fotos/",
+  // Carpetas de fotos: la ropa (y todo lo que no es calzado) en Fotos_ropa, el calzado en Fotos_zapatillas
+  carpetaFotos: "Fotos_ropa/",
+  carpetaZapatillas: "Fotos_zapatillas/",
   // Foto grande de la portada (dentro de la carpeta de fotos). Vacío = usa fotos de prendas
   fotoPortada: "portada.jpeg",
   fotoPortada2: "portada2.jpeg",
@@ -771,8 +773,10 @@ function fakePhoto(sub, color, v){
 const SIN_FOTO="data:image/svg+xml;charset=utf-8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400"><rect width="300" height="400" fill="#EFE5DD"/><text x="150" y="205" text-anchor="middle" font-family="Georgia,serif" font-size="18" fill="#8C7B70">Foto próximamente</text></svg>');
 // Si la foto no está en la carpeta Fotos, se busca también fuera de ella; si tampoco está, se muestra el aviso
 document.addEventListener("error",e=>{const t=e.target;if(!t||t.tagName!=="IMG")return;
-  const src=t.getAttribute("src")||"", carpeta=CONFIG.carpetaFotos||"";
-  if(!t.dataset.fb&&carpeta&&src.startsWith(carpeta)){t.dataset.fb="raiz";t.src=src.slice(carpeta.length);return}
+  const src=t.getAttribute("src")||"", A=CONFIG.carpetaFotos||"", B=CONFIG.carpetaZapatillas||"";
+  const base=src.startsWith(A)?src.slice(A.length):src.startsWith(B)?src.slice(B.length):null;
+  if(base!==null&&!t.dataset.fb){t.dataset.fb="otra";t.dataset.base=base;t.src=(src.startsWith(A)?B:A)+base;return}
+  if(t.dataset.fb==="otra"){t.dataset.fb="raiz";t.src=t.dataset.base;return}
   if(t.dataset.fb!=="1"){t.dataset.fb="1";t.src=SIN_FOTO}},true);
 
 /* =========================================================
@@ -805,7 +809,7 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 
 const slug=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 function parsePrice(v){let t=String(v??"").trim().replace(/[,.]\d{1,2}$/,"");return Number(t.replace(/[^\d]/g,""))||0}
-function photoUrl(f){return /^(https?:|data:)/i.test(f)?f:CONFIG.carpetaFotos+encodeURI(f)}
+function photoUrl(f,cat){if(/^(https?:|data:)/i.test(f))return f;const c=String(cat||"").toLowerCase()==="calzado"?CONFIG.carpetaZapatillas:CONFIG.carpetaFotos;return c+encodeURI(f)}
 const COLORES={negro:"#1C1C1C",blanco:"#FFFFFF",crudo:"#EDE6D6",natural:"#EDE6D6",beige:"#D8C3A5",arena:"#CDB79E",nude:"#D9B9A4",camel:"#B38B62",
   "marron":"#6B4A35",chocolate:"#4E3326",gris:"#9A9794",topo:"#8B7D72",azul:"#2F4A7A",marino:"#1F2A44",celeste:"#9DC3E6",jean:"#4A6283",verde:"#4E7A55",
   oliva:"#6B6A4E",militar:"#5B5E3F",rojo:"#B3261E",bordo:"#6D1F2B",rosa:"#E8B4BC",fucsia:"#C2185B",lila:"#B9A6D3",violeta:"#6A4C93",amarillo:"#E8C547",
@@ -835,7 +839,7 @@ function normalize(list){
     const talles=Object.keys(stock);
     if(color) Object.keys(stock).forEach(k=>{stock[color+"|"+k]=stock[k];delete stock[k]});
     const precioN=parsePrice(p.precio);
-    let fotos=String(p.fotos||"").split(/[,|;\n]/).map(s=>s.trim()).filter(Boolean).map(photoUrl);
+    let fotos=String(p.fotos||"").split(/[,|;\n]/).map(s=>s.trim()).filter(Boolean).map(f=>photoUrl(f,p.categoria));
     if(!fotos.length) fotos=[0,1,2].map(v=>fakePhoto(p.subcategoria||p.categoria,p.tono||(color?colorHex(p.color):"#CDB79E"),v));
     const caract=String(p.caracteristicas||"").split(";").map(s=>s.split(":")).filter(a=>a[0]&&a[0].trim()).map(a=>[a[0].trim(),(a.slice(1).join(":")||"").trim()]);
     return {...p,id:String(p.id||"").trim(),color,colorHex:colorHex(p.color),categoria:String(p.categoria||"").trim(),subcategoria:normSub(p.subcategoria),precio:precioN,talles,stock,sinTalle,encargo,fotos,caract,nuevo:String(p.nuevo||"").trim().toLowerCase()==="si",orden:i};
