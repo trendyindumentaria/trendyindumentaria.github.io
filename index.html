@@ -215,11 +215,11 @@ footer a:hover{color:#fff}
 .hint{font-size:.8rem;color:#b0482f;min-height:1.2em;margin-bottom:6px}
 .ask{font-size:.85rem;color:var(--ink-2);text-decoration:underline;text-underline-offset:4px;align-self:flex-start;margin-top:4px}
 
-.drawer{position:fixed;top:0;right:0;height:100%;width:min(420px,100%);background:var(--bg);z-index:70;transform:translateX(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(420px,100%);background:var(--bg);z-index:70;transform:translateX(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:var(--shadow);overflow-y:auto;overscroll-behavior:contain}
 .drawer.on{transform:translateX(0)}
-.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--line)}
+.drawer-head{position:sticky;top:0;z-index:2;background:var(--bg);flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--line)}
 .drawer-head h3{font-size:1.5rem}
-.drawer-body{flex:1;overflow:auto;padding:8px 24px}
+.drawer-body{flex:1 0 auto;padding:8px 24px}
 .ci{display:grid;grid-template-columns:72px 1fr auto;gap:14px;padding:16px 0;border-bottom:1px solid var(--line);align-items:start}
 .ci img{width:72px;aspect-ratio:3/4;object-fit:cover;background:var(--nude)}
 .ci h4{font-weight:400;font-size:.92rem}
@@ -231,7 +231,7 @@ footer a:hover{color:#fff}
 .rm{font-size:.72rem;color:var(--taupe);text-decoration:underline;text-underline-offset:3px}
 .cart-empty{text-align:center;padding:70px 10px;color:var(--taupe)}
 .cart-empty svg{width:48px;height:48px;stroke:var(--taupe);fill:none;stroke-width:1;margin:0 auto 16px}
-.drawer-foot{border-top:1px solid var(--line);padding:18px 24px 22px;background:var(--white)}
+.drawer-foot{flex-shrink:0;border-top:1px solid var(--line);padding:18px 24px 22px;background:var(--white)}
 .order-form{display:grid;gap:10px;margin-bottom:16px}
 .order-form input,.order-form select{width:100%;font:inherit;font-size:.9rem;color:var(--ink);padding:10px 12px;border:1px solid var(--line);background:var(--bg);outline:none}
 input::placeholder{color:#9b908a;opacity:1}
