@@ -691,7 +691,7 @@ const CONFIG = {
 const HORARIOS = {dias:[1,2,3,4,5,6], turnos:[["09:00","12:30"],["17:00","20:30"]]};
 
 const CATEGORIAS = {
-  "Ropa": ["Remeras","Camisas y Blusas","Vestidos y Polleras","Pantalones","Shorts","Conjuntos","Sastrería","Abrigos"],
+  "Ropa": ["Remeras y Tops","Camisas y Blusas","Vestidos y Polleras","Pantalones","Shorts","Conjuntos","Sastrería","Abrigos"],
   "Calzado": ["Zapatillas"],
   "Accesorios": [],
   "Papelería": []
@@ -711,12 +711,12 @@ const EJEMPLO = [
   {id:"L01",nombre:"Agenda 2027 Tapa Dura",categoria:"Papelería",subcategoria:"",precio:19900,talles:"5",descripcion:"Agenda semanal 2027 con tapa dura, elástico y cinta señaladora.",caracteristicas:"Formato: A5; Hojas: 160; Diseño: Semana a la vista",tono:"#E8C9C1",nuevo:"si"},
   {id:"L02",nombre:"Libreta Lisa Beige",categoria:"Papelería",subcategoria:"",precio:8900,talles:"3",descripcion:"Libreta de hojas lisas con tapa de lino.",caracteristicas:"Formato: A6; Hojas: 96",tono:"#D7C4A8"},
   {id:"E01",nombre:"Zapatilla Urbana Beige",categoria:"Calzado",subcategoria:"Zapatillas",precio:71000,talles:"",descripcion:"Zapatilla de cuero ecológico con suela de goma. Modelo a pedido.",caracteristicas:"Material: Cuero ecológico; Color: Beige; Suela: Goma",tono:"#CDB79E",disponible:"pedido"},
-  {id:"R01",nombre:"Remera Lino Básica",categoria:"Ropa",subcategoria:"Remeras",precio:18500,talles:"S,M,L",descripcion:"Remera de lino de corte recto, fresca y fácil de combinar.",caracteristicas:"Tela: Lino; Color: Crudo; Calce: Recto",tono:"#E9E1D4",nuevo:"si"},
-  {nombre:"Remera Básica Algodón",categoria:"Ropa",subcategoria:"Remeras",precio:17500,talles:"S,M",color:"Negro",descripcion:"Remera de algodón peinado, cuello redondo. Disponible en varios colores.",caracteristicas:"Tela: Algodón; Calce: Regular",nuevo:"si"},
-  {nombre:"Remera Básica Algodón",categoria:"Ropa",subcategoria:"Remeras",precio:17500,talles:"M:2,L",color:"Blanco"},
-  {nombre:"Remera Básica Algodón",categoria:"Ropa",subcategoria:"Remeras",precio:17500,talles:"S",color:"Rosa"},
-  {id:"R02",nombre:"Remera Morley Negra",categoria:"Ropa",subcategoria:"Remeras",precio:15900,talles:"S,M,L,XL",descripcion:"Básica de morley con caída suave, ideal para usar sola o debajo de un blazer.",caracteristicas:"Tela: Morley; Color: Negro; Calce: Al cuerpo",tono:"#2A2A2A"},
-  {id:"R03",nombre:"Remerón Oversize Arena",categoria:"Ropa",subcategoria:"Remeras",precio:21000,talles:"Único",descripcion:"Remerón amplio de algodón peinado. Prenda única.",caracteristicas:"Tela: Algodón; Color: Arena; Calce: Oversize",tono:"#CDB79E",nuevo:"si"},
+  {id:"R01",nombre:"Remera Lino Básica",categoria:"Ropa",subcategoria:"Remeras y Tops",precio:18500,talles:"S,M,L",descripcion:"Remera de lino de corte recto, fresca y fácil de combinar.",caracteristicas:"Tela: Lino; Color: Crudo; Calce: Recto",tono:"#E9E1D4",nuevo:"si"},
+  {nombre:"Remera Básica Algodón",categoria:"Ropa",subcategoria:"Remeras y Tops",precio:17500,talles:"S,M",color:"Negro",descripcion:"Remera de algodón peinado, cuello redondo. Disponible en varios colores.",caracteristicas:"Tela: Algodón; Calce: Regular",nuevo:"si"},
+  {nombre:"Remera Básica Algodón",categoria:"Ropa",subcategoria:"Remeras y Tops",precio:17500,talles:"M:2,L",color:"Blanco"},
+  {nombre:"Remera Básica Algodón",categoria:"Ropa",subcategoria:"Remeras y Tops",precio:17500,talles:"S",color:"Rosa"},
+  {id:"R02",nombre:"Remera Morley Negra",categoria:"Ropa",subcategoria:"Remeras y Tops",precio:15900,talles:"S,M,L,XL",descripcion:"Básica de morley con caída suave, ideal para usar sola o debajo de un blazer.",caracteristicas:"Tela: Morley; Color: Negro; Calce: Al cuerpo",tono:"#2A2A2A"},
+  {id:"R03",nombre:"Remerón Oversize Arena",categoria:"Ropa",subcategoria:"Remeras y Tops",precio:21000,talles:"Único",descripcion:"Remerón amplio de algodón peinado. Prenda única.",caracteristicas:"Tela: Algodón; Color: Arena; Calce: Oversize",tono:"#CDB79E",nuevo:"si"},
   {id:"C01",nombre:"Camisa Satén Champagne",categoria:"Ropa",subcategoria:"Camisas y Blusas",precio:32500,talles:"S,M",descripcion:"Camisa de satén con brillo sutil. Perfecta para eventos o una salida.",caracteristicas:"Tela: Satén; Color: Champagne; Calce: Suelto",tono:"#E4CFB2",nuevo:"si"},
   {id:"C02",nombre:"Camisa Blanca Clásica",categoria:"Ropa",subcategoria:"Camisas y Blusas",precio:28900,talles:"S,M,L",descripcion:"La camisa blanca que no puede faltar. Algodón con un toque de elastano.",caracteristicas:"Tela: Poplín; Color: Blanco; Calce: Regular",tono:"#F3F1EC"},
   {id:"C03",nombre:"Camisa Rayada Celeste",categoria:"Ropa",subcategoria:"Camisas y Blusas",precio:27500,talles:"M",descripcion:"Camisa a rayas finas, para un look relajado. Última unidad.",caracteristicas:"Tela: Algodón; Color: Celeste/Blanco; Calce: Oversize",tono:"#B9CCDB"},
@@ -741,7 +741,7 @@ const EJEMPLO = [
    FOTOS DE EJEMPLO (ilustraciones mientras no haya fotos reales)
    ========================================================= */
 const SHAPES = {
-  Remeras:'<path d="M110 90 80 100 45 140 70 170 95 150V310H205V150L230 170 255 140 220 100 190 90Q150 122 110 90Z"/>',
+  "Remeras y Tops":'<path d="M110 90 80 100 45 140 70 170 95 150V310H205V150L230 170 255 140 220 100 190 90Q150 122 110 90Z"/>',
   "Camisas y Blusas":'<path d="M112 85 78 98 55 222 80 227 98 150V315H202V150L220 227 245 222 222 98 188 85 150 115Z"/><path d="M112 85 150 115 132 128Z M188 85 150 115 168 128Z" opacity=".6"/><g opacity=".5"><circle cx="150" cy="150" r="3"/><circle cx="150" cy="190" r="3"/><circle cx="150" cy="230" r="3"/><circle cx="150" cy="270" r="3"/></g>',
   Pantalones:'<path d="M105 70H195L212 335H165L150 140 135 335H88Z"/><path d="M105 70H195V86H105Z" opacity=".6"/>',
   Shorts:'<path d="M98 120H202L218 255 162 260 150 178 138 260 82 255Z"/><path d="M98 120H202V136H98Z" opacity=".6"/>',
@@ -821,7 +821,7 @@ const colorLabel=n=>String(n||"").replace(/#[0-9a-f]{6}\b/i,"").trim();
 const sizeOf=k=>String(k).includes("|")?String(k).split("|")[1]:String(k);
 const colorOf=k=>String(k).includes("|")?String(k).split("|")[0]:"";
 function varTxt(p,k,sep){const c=colorOf(k),s=sizeOf(k);return [c,p.sinTalle?"":"Talle "+s].filter(Boolean).join(sep||" · ")}
-const SUB_ALIAS={"vestidos":"Vestidos y Polleras","polleras":"Vestidos y Polleras","vestidos y polleras":"Vestidos y Polleras","vestidos/polleras":"Vestidos y Polleras"};
+const SUB_ALIAS={"remeras":"Remeras y Tops","remera":"Remeras y Tops","tops":"Remeras y Tops","top":"Remeras y Tops","remeras y top":"Remeras y Tops","remeras y tops":"Remeras y Tops","remeras/tops":"Remeras y Tops","vestidos":"Vestidos y Polleras","polleras":"Vestidos y Polleras","vestidos y polleras":"Vestidos y Polleras","vestidos/polleras":"Vestidos y Polleras"};
 function normSub(v){const t=String(v||"").trim();return SUB_ALIAS[t.toLowerCase()]||t}
 function normalize(list){
   const seen={};
@@ -841,7 +841,7 @@ function normalize(list){
     if(color) Object.keys(stock).forEach(k=>{stock[color+"|"+k]=stock[k];delete stock[k]});
     const precioN=parsePrice(p.precio);
     let fotos=String(p.fotos||"").split(/[,|;\n]/).map(s=>s.trim()).filter(Boolean).map(f=>photoUrl(f,p.categoria));
-    if(!fotos.length) fotos=[0,1,2].map(v=>fakePhoto(p.subcategoria||p.categoria,p.tono||(color?colorHex(p.color):"#CDB79E"),v));
+    if(!fotos.length) fotos=[0,1,2].map(v=>fakePhoto(normSub(p.subcategoria)||p.categoria,p.tono||(color?colorHex(p.color):"#CDB79E"),v));
     const caract=String(p.caracteristicas||"").split(";").map(s=>s.split(":")).filter(a=>a[0]&&a[0].trim()).map(a=>[a[0].trim(),(a.slice(1).join(":")||"").trim()]);
     return {...p,id:String(p.id||"").trim(),color,colorHex:colorHex(p.color),categoria:String(p.categoria||"").trim(),subcategoria:normSub(p.subcategoria),precio:precioN,talles,stock,sinTalle,encargo,fotos,caract,nuevo:String(p.nuevo||"").trim().toLowerCase()==="si",orden:i};
   }).filter(p=>p.talles.length);
@@ -938,7 +938,7 @@ function renderStatic(){
 
   // tarjetas de categoría
   const catTiles=[...CATEGORIAS.Ropa.map(s=>[s,s]),["Calzado","Zapatillas"],["Accesorios","Accesorios"],["Papelería","Papelería"]];
-  const tones={Remeras:"#CDB79E","Camisas y Blusas":"#E4CFB2","Vestidos y Polleras":"#A8565E",Pantalones:"#2A2A2A",Shorts:"#B9A48E",Conjuntos:"#6B6A4E","Sastrería":"#7E7A76",Abrigos:"#B38B62",Zapatillas:"#3A3A3A",Accesorios:"#8C6E5A","Papelería":"#D9B9AE"};
+  const tones={"Remeras y Tops":"#CDB79E","Camisas y Blusas":"#E4CFB2","Vestidos y Polleras":"#A8565E",Pantalones:"#2A2A2A",Shorts:"#B9A48E",Conjuntos:"#6B6A4E","Sastrería":"#7E7A76",Abrigos:"#B38B62",Zapatillas:"#3A3A3A",Accesorios:"#8C6E5A","Papelería":"#D9B9AE"};
   $("#cats").innerHTML=catTiles.map(([label,shape])=>`<button class="cat" data-cat="${label}"><img src="${fakeIcon(shape,tones[shape])}" alt=""><span>${label}</span></button>`).join("");
 
   // chips
