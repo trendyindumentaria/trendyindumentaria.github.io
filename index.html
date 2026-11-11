@@ -715,7 +715,7 @@ const CONFIG = {
   carpetaZapatillas: "Fotos_zapatillas/",
   // Foto grande de la portada (dentro de la carpeta de fotos). Vacío = usa fotos de prendas
   fotoPortada: "portada.jpeg",
-  fotoPortada2: "portada2.jpeg",
+  fotoPortada2: "portada2.jpg",
   envioGratisDesde: 150000,      // se reemplaza por el valor de la hoja «Envios»
   envioGratisAplicaA: "todo",    // "todo" o "sucursal"
   enviosCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRebpf8r6xx1xze75vMvfPWE9ZJBPWxXCL1ftLltYOlZ_1yOVEn9CN7W5znIel-IAu4BtnHLvBMiZEx/pub?gid=1311061001&single=true&output=csv",
@@ -848,7 +848,7 @@ const COLORES={negro:"#1C1C1C",blanco:"#FFFFFF",crudo:"#EDE6D6",natural:"#EDE6D6
   "marron":"#6B4A35",chocolate:"#4E3326",gris:"#9A9794",topo:"#8B7D72",azul:"#2F4A7A",marino:"#1F2A44",celeste:"#9DC3E6",jean:"#4A6283",verde:"#4E7A55",
   oliva:"#6B6A4E",militar:"#5B5E3F",rojo:"#B3261E",bordo:"#6D1F2B",rosa:"#E8B4BC",fucsia:"#C2185B",lila:"#B9A6D3",violeta:"#6A4C93",amarillo:"#E8C547",
   mostaza:"#C9A227",naranja:"#E07B39",coral:"#F08A75",dorado:"#C9A44C",plateado:"#C0C0C0",terracota:"#B5643E",khaki:"#BDB08A",caqui:"#BDB08A",salmon:"#F2A38D",
-  blanca:"#FFFFFF",negra:"#1C1C1C",dorada:"#C9A44C",plateada:"#C0C0C0",roja:"#B3261E",amarilla:"#E8C547",crema:"#F2E8D0"};
+  blanca:"#FFFFFF",negra:"#1C1C1C",dorada:"#C9A44C",plateada:"#C0C0C0",roja:"#B3261E",amarilla:"#E8C547",crema:"#F2E8D0",champagne:"#E6D2B5",caramelo:"#B7743A",tostado:"#A87A4F",tiza:"#F1EEE6"};
 function colorHex(name){const n=String(name||"");const h=n.match(/#[0-9a-f]{6}\b/i);if(h)return h[0];
   const k=n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");let best=null;for(const w in COLORES){if(k.includes(w)&&(!best||w.length>best.length))best=w}return best?COLORES[best]:"#CDB79E"}
 const colorLabel=n=>String(n||"").replace(/#[0-9a-f]{6}\b/i,"").trim();
