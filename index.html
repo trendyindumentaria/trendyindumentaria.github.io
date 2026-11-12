@@ -401,15 +401,16 @@ input::placeholder{color:#9b908a;opacity:1}
 /* ---------- Portada: carrusel animado (clases th-) ---------- */
 .th-hero{
   --th-bg:var(--nude,#EDE1D8); --th-ink:var(--ink,#141414); --th-accent:var(--taupe,#8C7B70); --th-dur:5.5s;
-  position:relative; width:100%; height:clamp(440px, calc(100vh - 240px), 580px);
+  --th-h:clamp(500px, calc(100vh - 190px), 640px); --th-tw:400px; --th-gap:80px;
+  position:relative; width:100%; height:var(--th-h);
   overflow:hidden; padding:0; background:var(--th-bg); color:var(--th-ink);
   font-family:'Montserrat',system-ui,sans-serif;
 }
 .th-hero *{box-sizing:border-box}
-.th-slide{position:absolute; inset:0; margin:0 auto; max-width:1240px; padding:0 24px; display:grid; grid-template-columns:minmax(0,1fr) auto; column-gap:48px;
+.th-slide{position:absolute; inset:0; display:grid; grid-template-columns:minmax(0,var(--th-tw)) auto; justify-content:center; column-gap:var(--th-gap); padding:0 24px;
   opacity:0; visibility:hidden; transition:opacity 1.2s ease, visibility 0s 1.2s}
 .th-slide.is-active{opacity:1; visibility:visible; transition:opacity 1.2s ease, visibility 0s}
-.th-media{grid-column:2; grid-row:1; overflow:hidden; height:100%; aspect-ratio:3/4}
+.th-media{grid-column:2; grid-row:1; overflow:hidden; height:100%; aspect-ratio:4/5}
 .th-media img{width:100%; height:100%; object-fit:cover; display:block; transform:scale(1)}
 .th-slide.is-active .th-media img{animation:th-zoom calc(var(--th-dur) + 1.5s) ease-out forwards}
 @keyframes th-zoom{from{transform:scale(1)}to{transform:scale(1.06)}}
@@ -426,12 +427,12 @@ input::placeholder{color:#9b908a;opacity:1}
 .th-slide.is-active .th-sub{animation:th-up 1s .85s ease forwards}
 @keyframes th-up{to{opacity:1; transform:none}}
 
-.th-cta{position:absolute; left:calc(max(0px, (100% - 1240px) / 2) + 24px); bottom:13%; z-index:3; text-decoration:none;
+.th-cta{position:absolute; left:max(24px, calc((100% - var(--th-tw) - var(--th-gap) - var(--th-h) * .8) / 2)); bottom:13%; z-index:3; text-decoration:none;
   font-size:.8rem; letter-spacing:.25em; text-transform:uppercase; color:var(--th-ink);
   border:1px solid var(--th-ink); padding:.95em 2.2em; transition:background .3s,color .3s}
 .th-cta:hover{background:var(--th-ink); color:var(--th-bg)}
 
-.th-dots{position:absolute; left:calc(max(0px, (100% - 1240px) / 2) + 24px); bottom:6%; z-index:3; display:flex; gap:.6rem}
+.th-dots{position:absolute; left:max(24px, calc((100% - var(--th-tw) - var(--th-gap) - var(--th-h) * .8) / 2)); bottom:6%; z-index:3; display:flex; gap:.6rem}
 .th-dots button{width:28px; height:2px; padding:0; border:0; background:rgba(20,20,20,.22); cursor:pointer; position:relative}
 .th-dots button::after{content:""; position:absolute; inset:-10px 0}
 .th-dots button[aria-selected="true"]{background:var(--th-ink)}
@@ -440,7 +441,7 @@ input::placeholder{color:#9b908a;opacity:1}
 /* ---------- Celular: foto a pantalla completa con el texto encima ---------- */
 @media (max-width:760px){
   .th-hero{height:calc(100vh - 112px); height:calc(100svh - 112px); min-height:520px}
-  .th-slide{grid-template-columns:1fr; max-width:none; padding:0; column-gap:0}
+  .th-slide{grid-template-columns:1fr; justify-content:stretch; padding:0; column-gap:0}
   .th-media{grid-column:1; aspect-ratio:auto; width:100%}
   .th-media img{object-fit:cover}
   .th-slide.is-active .th-media img{animation-name:th-zoom-m}
