@@ -409,10 +409,11 @@ input::placeholder{color:#9b908a;opacity:1}
 .th-slide{position:absolute; inset:0; display:grid; grid-template-columns:1fr 1fr;
   opacity:0; visibility:hidden; transition:opacity 1.2s ease, visibility 0s 1.2s}
 .th-slide.is-active{opacity:1; visibility:visible; transition:opacity 1.2s ease, visibility 0s}
-.th-media{grid-column:2; grid-row:1; overflow:hidden; height:100%}
-.th-media img{width:100%; height:100%; object-fit:cover; display:block; transform:scale(1.02)}
+.th-media{grid-column:2; grid-row:1; overflow:hidden; height:100%; padding:28px 0}
+.th-media img{width:100%; height:100%; object-fit:contain; display:block; transform:scale(1)}
 .th-slide.is-active .th-media img{animation:th-zoom calc(var(--th-dur) + 1.5s) ease-out forwards}
-@keyframes th-zoom{from{transform:scale(1.02)}to{transform:scale(1.12)}}
+@keyframes th-zoom{from{transform:scale(1)}to{transform:scale(1.04)}}
+@keyframes th-zoom-m{from{transform:scale(1.02)}to{transform:scale(1.12)}}
 
 .th-text{grid-column:1; grid-row:1; align-self:center; padding:0 8% 0 12%}
 .th-kicker{display:block; font-size:.78rem; letter-spacing:.35em; text-transform:uppercase; color:var(--th-accent); margin-bottom:1.2rem}
@@ -440,7 +441,9 @@ input::placeholder{color:#9b908a;opacity:1}
 @media (max-width:760px){
   .th-hero{height:calc(100vh - 112px); height:calc(100svh - 112px); min-height:520px}
   .th-slide{grid-template-columns:1fr}
-  .th-media{grid-column:1}
+  .th-media{grid-column:1; padding:0}
+  .th-media img{object-fit:cover}
+  .th-slide.is-active .th-media img{animation-name:th-zoom-m}
   .th-media::after{content:""; position:absolute; inset:0;
     background:linear-gradient(to top,rgba(20,15,12,.78) 0%,rgba(20,15,12,.45) 40%,rgba(20,15,12,0) 65%)}
   .th-text{grid-column:1; align-self:end; padding:0 7% 190px; color:#fff; z-index:2; text-shadow:0 1px 12px rgba(0,0,0,.25)}
@@ -512,7 +515,7 @@ input::placeholder{color:#9b908a;opacity:1}
   </div>
 
   <div class="th-slide">
-    <div class="th-media"><img src="img/2-sastrero.webp" alt="Conjunto tejido marrón de chaleco y pantalón" loading="lazy" style="object-position:50% 45%"></div>
+    <div class="th-media"><img src="img/2-sastrero.webp" alt="Vestido rojo corto con volados" loading="lazy" style="object-position:50% 40%"></div>
     <div class="th-text">
       <span class="th-kicker">02</span>
       <h2 class="th-title">Elegancia</h2>
@@ -521,7 +524,7 @@ input::placeholder{color:#9b908a;opacity:1}
   </div>
 
   <div class="th-slide">
-    <div class="th-media"><img src="img/3-chaleco.webp" alt="Chaleco de jean con brillos, short con volados y botas" loading="lazy" style="object-position:50% 40%"></div>
+    <div class="th-media"><img src="img/3-chaleco.webp" alt="Pantalones sastreros marrón y negro con tachas" loading="lazy" style="object-position:50% 30%"></div>
     <div class="th-text">
       <span class="th-kicker">03</span>
       <h2 class="th-title">Estilo</h2>
@@ -548,7 +551,7 @@ input::placeholder{color:#9b908a;opacity:1}
   </div>
 
   <div class="th-slide">
-    <div class="th-media"><img src="img/6-jean.webp" alt="Jean con franjas y musculosa blanca" loading="lazy" style="object-position:50% 30%"></div>
+    <div class="th-media"><img src="img/6-jean.webp" alt="Conjunto negro de top halter y pantalón" loading="lazy" style="object-position:50% 40%"></div>
     <div class="th-text">
       <span class="th-kicker">06</span>
       <h2 class="th-title">Sos vos</h2>
