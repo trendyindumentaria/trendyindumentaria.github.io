@@ -11,6 +11,7 @@
 <meta name="description" content="Trendy — Indumentaria femenina. Ropa y calzado con envíos a todo el país y Paraguay.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -91,19 +92,7 @@ nav.main > a:hover::after, nav.main .dd:hover > button::after{transform:scaleX(1
 .search-bar input:focus{border-color:var(--ink)}
 
 /* ---------- Hero ---------- */
-.hero{position:relative;overflow:hidden;background:#fff}
-.hero-inner{display:grid;grid-template-columns:1fr 1.15fr;align-items:center;min-height:660px;gap:40px}
-.hero-text{padding:60px 0}
-.hero-text h1{font-size:clamp(2.6rem,5.6vw,4.6rem);line-height:1.05;margin:18px 0 20px}
-.hero-text h1 em{font-style:italic;color:var(--taupe)}
-.hero-text p{max-width:430px;color:var(--ink-2);font-size:1.05rem;margin-bottom:32px}
 .hero-actions{display:flex;gap:14px;flex-wrap:wrap}
-.hero-collage{position:relative;height:600px}
-.hero-collage figure{position:absolute;overflow:hidden;box-shadow:var(--shadow)}
-.hero-collage figure img{width:100%;height:100%;object-fit:cover}
-.hc1{width:56%;height:86%;left:0;top:2%}
-.hc2{width:46%;height:70%;right:0;top:22%}
-.hero-badge{position:absolute;left:46%;bottom:0;background:var(--ink);color:#fff;padding:18px 22px;font-family:var(--serif);font-style:italic;font-size:1.1rem;z-index:2}
 
 /* ---------- Categorías ---------- */
 section{padding:84px 0;scroll-margin-top:110px}
@@ -379,11 +368,7 @@ input::placeholder{color:#9b908a;opacity:1}
   .dd.open .dd-menu{display:grid}
   .dd-menu button{text-align:center}
   .dd-menu > div{align-items:center;margin-bottom:10px}
-  .hero-inner{grid-template-columns:1fr;min-height:0;gap:0}
-  .hero-text{padding:46px 0 10px;text-align:center}
-  .hero-text p{margin-left:auto;margin-right:auto}
   .hero-actions{justify-content:center}
-  .hero-collage{height:460px;margin-bottom:30px}
   section{padding:60px 0}
   .cats{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
   .cats .cat{width:calc(25% - 6px)}
@@ -411,6 +396,67 @@ input::placeholder{color:#9b908a;opacity:1}
   .local-card{padding:40px 22px}
   .welcome{padding:60px 0 50px}
   .band{padding:64px 0}
+}
+
+/* ---------- Portada: carrusel animado (clases th-) ---------- */
+.th-hero{
+  --th-bg:var(--nude,#EDE1D8); --th-ink:var(--ink,#141414); --th-accent:var(--taupe,#8C7B70); --th-dur:5.5s;
+  position:relative; width:100%; height:clamp(500px, calc(100vh - 180px), 760px);
+  overflow:hidden; padding:0; background:var(--th-bg); color:var(--th-ink);
+  font-family:'Montserrat',system-ui,sans-serif;
+}
+.th-hero *{box-sizing:border-box}
+.th-slide{position:absolute; inset:0; display:grid; grid-template-columns:1fr 1fr;
+  opacity:0; visibility:hidden; transition:opacity 1.2s ease, visibility 0s 1.2s}
+.th-slide.is-active{opacity:1; visibility:visible; transition:opacity 1.2s ease, visibility 0s}
+.th-media{grid-column:2; grid-row:1; overflow:hidden; height:100%}
+.th-media img{width:100%; height:100%; object-fit:cover; display:block; transform:scale(1.02)}
+.th-slide.is-active .th-media img{animation:th-zoom calc(var(--th-dur) + 1.5s) ease-out forwards}
+@keyframes th-zoom{from{transform:scale(1.02)}to{transform:scale(1.12)}}
+
+.th-text{grid-column:1; grid-row:1; align-self:center; padding:0 8% 0 12%}
+.th-kicker{display:block; font-size:.78rem; letter-spacing:.35em; text-transform:uppercase; color:var(--th-accent); margin-bottom:1.2rem}
+.th-title{font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:clamp(3rem,6.5vw,6rem); line-height:1; margin:0 0 1.2rem}
+.th-brand{letter-spacing:.18em; font-weight:500}
+.th-sub{font-size:clamp(.95rem,1.3vw,1.15rem); font-weight:300; letter-spacing:.04em; margin:0; max-width:24ch}
+.th-kicker,.th-title,.th-sub{opacity:0; transform:translateY(18px)}
+.th-slide.is-active .th-kicker{animation:th-up .9s .35s ease forwards}
+.th-slide.is-active .th-title{animation:th-up 1s .55s ease forwards}
+.th-slide.is-active .th-sub{animation:th-up 1s .85s ease forwards}
+@keyframes th-up{to{opacity:1; transform:none}}
+
+.th-cta{position:absolute; left:6%; bottom:13%; z-index:3; text-decoration:none;
+  font-size:.8rem; letter-spacing:.25em; text-transform:uppercase; color:var(--th-ink);
+  border:1px solid var(--th-ink); padding:.95em 2.2em; transition:background .3s,color .3s}
+.th-cta:hover{background:var(--th-ink); color:var(--th-bg)}
+
+.th-dots{position:absolute; left:6%; bottom:6%; z-index:3; display:flex; gap:.6rem}
+.th-dots button{width:28px; height:2px; padding:0; border:0; background:rgba(20,20,20,.22); cursor:pointer; position:relative}
+.th-dots button::after{content:""; position:absolute; inset:-10px 0}
+.th-dots button[aria-selected="true"]{background:var(--th-ink)}
+.th-progress{display:none}
+
+/* ---------- Celular: foto a pantalla completa con el texto encima ---------- */
+@media (max-width:760px){
+  .th-hero{height:calc(100vh - 112px); height:calc(100svh - 112px); min-height:520px}
+  .th-slide{grid-template-columns:1fr}
+  .th-media{grid-column:1}
+  .th-media::after{content:""; position:absolute; inset:0;
+    background:linear-gradient(to top,rgba(20,15,12,.78) 0%,rgba(20,15,12,.45) 40%,rgba(20,15,12,0) 65%)}
+  .th-text{grid-column:1; align-self:end; padding:0 7% 190px; color:#fff; z-index:2; text-shadow:0 1px 12px rgba(0,0,0,.25)}
+  .th-sub{max-width:none}
+  .th-kicker{color:#f0dcc4; margin-bottom:.7rem}
+  .th-title{font-size:clamp(2.8rem,13vw,4rem); margin-bottom:.6rem}
+  .th-cta,.th-dots{left:7%}
+  .th-cta{bottom:80px; color:#fff; border-color:#fff; padding:.85em 1.9em}
+  .th-cta:hover{background:#fff; color:var(--th-ink)}
+  .th-dots{bottom:38px}
+  .th-dots button{background:rgba(255,255,255,.4)}
+  .th-dots button[aria-selected="true"]{background:#fff}
+}
+@media (prefers-reduced-motion:reduce){
+  .th-slide.is-active .th-media img{animation:none}
+  .th-kicker,.th-title,.th-sub{opacity:1; transform:none; animation:none!important}
 }
 </style>
 </head>
@@ -454,19 +500,65 @@ input::placeholder{color:#9b908a;opacity:1}
   </div>
 </header>
 
-<section class="hero" style="padding:0">
-  <div class="container hero-inner">
-    <div class="hero-text">
-      <div class="eyebrow">Nueva temporada</div>
-      <h1>Elegancia para <em>cada día</em></h1>
-      <p>Prendas seleccionadas para vos. Elegí tus favoritas, armá tu pedido y terminá la compra por WhatsApp.</p>
-      <div class="hero-actions">
-        <a href="#catalogo" class="btn btn-dark">Ver catálogo</a>
-        <a href="#como-comprar" class="btn btn-light">Cómo comprar</a>
-      </div>
+<!-- Portada: carrusel animado -->
+<section class="th-hero" aria-label="Trendy - portada">
+  <div class="th-slide is-active">
+    <div class="th-media"><img src="img/1-pollera.webp" alt="Pollera blanca con puntilla" fetchpriority="high" style="object-position:50% 40%"></div>
+    <div class="th-text">
+      <span class="th-kicker">Indumentaria femenina</span>
+      <h1 class="th-title th-brand">TRENDY</h1>
+      <p class="th-sub">Moda que te define.</p>
     </div>
-    <div class="hero-collage" id="heroCollage"></div>
   </div>
+
+  <div class="th-slide">
+    <div class="th-media"><img src="img/2-sastrero.webp" alt="Pantalón sastrero marrón con musculosa blanca" loading="lazy" style="object-position:50% 35%"></div>
+    <div class="th-text">
+      <span class="th-kicker">02</span>
+      <h2 class="th-title">Elegancia</h2>
+      <p class="th-sub">Para cada momento de tu día.</p>
+    </div>
+  </div>
+
+  <div class="th-slide">
+    <div class="th-media"><img src="img/3-chaleco.webp" alt="Chaleco de jean con brillos, short con volados y botas" loading="lazy" style="object-position:50% 40%"></div>
+    <div class="th-text">
+      <span class="th-kicker">03</span>
+      <h2 class="th-title">Estilo</h2>
+      <p class="th-sub">Combiná, animate, destacate.</p>
+    </div>
+  </div>
+
+  <div class="th-slide">
+    <div class="th-media"><img src="img/4-conjunto.webp" alt="Conjunto celeste de chaleco y pantalón" loading="lazy" style="object-position:50% 40%"></div>
+    <div class="th-text">
+      <span class="th-kicker">04</span>
+      <h2 class="th-title">Tendencia</h2>
+      <p class="th-sub">Lo nuevo de la temporada.</p>
+    </div>
+  </div>
+
+  <div class="th-slide">
+    <div class="th-media"><img src="img/5-zapatillas.webp" alt="Zapatillas blancas y celestes" loading="lazy" style="object-position:50% 45%"></div>
+    <div class="th-text">
+      <span class="th-kicker">05</span>
+      <h2 class="th-title">Paso a paso</h2>
+      <p class="th-sub">Zapatillas y calzado del 34 al 39.</p>
+    </div>
+  </div>
+
+  <div class="th-slide">
+    <div class="th-media"><img src="img/6-jean.webp" alt="Jean con franjas y musculosa blanca" loading="lazy" style="object-position:50% 30%"></div>
+    <div class="th-text">
+      <span class="th-kicker">06</span>
+      <h2 class="th-title">Sos vos</h2>
+      <p class="th-sub">Elegí tu look y pedilo por WhatsApp.</p>
+    </div>
+  </div>
+
+  <a class="th-cta" href="#catalogo">Ver colección</a>
+  <div class="th-dots" role="tablist" aria-label="Elegir imagen"></div>
+  <div class="th-progress"><span></span></div>
 </section>
 
 <section class="welcome">
@@ -695,6 +787,35 @@ input::placeholder{color:#9b908a;opacity:1}
 <div class="toast" id="toast"></div>
 
 <script>
+/* ---------- Portada: carrusel animado ---------- */
+(function(){
+  var hero=document.querySelector('.th-hero'); if(!hero) return;
+  var slides=hero.querySelectorAll('.th-slide'), dotsBox=hero.querySelector('.th-dots');
+  var i=0, timer, dur=5500;
+  slides.forEach(function(_,n){
+    var b=document.createElement('button'); b.type='button'; b.setAttribute('role','tab');
+    b.setAttribute('aria-label','Imagen '+(n+1)); b.onclick=function(){go(n);restart();};
+    dotsBox.appendChild(b);
+  });
+  var dots=dotsBox.querySelectorAll('button');
+  function go(n){
+    slides[i].classList.remove('is-active');
+    i=(n+slides.length)%slides.length;
+    var img=slides[i].querySelector('img'); img.loading='eager';
+    slides[(i+1)%slides.length].querySelector('img').loading='eager'; // precarga la siguiente
+    slides[i].classList.add('is-active');
+    dots.forEach(function(d,k){d.setAttribute('aria-selected',k===i)});
+  }
+  function restart(){clearInterval(timer); timer=setInterval(function(){go(i+1)},dur);}
+  go(0); restart();
+  document.addEventListener('visibilitychange',function(){document.hidden?clearInterval(timer):restart();});
+  // deslizar con el dedo en el celular
+  var x0=null;
+  hero.addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});
+  hero.addEventListener('touchend',function(e){ if(x0===null)return;
+    var dx=e.changedTouches[0].clientX-x0; if(Math.abs(dx)>40){go(i+(dx<0?1:-1));restart();} x0=null;});
+})();
+
 /* =========================================================
    CONFIGURACIÓN DE LA TIENDA
    ========================================================= */
@@ -714,8 +835,6 @@ const CONFIG = {
   carpetaFotos: "Fotos_ropa/",
   carpetaZapatillas: "Fotos_zapatillas/",
   // Foto grande de la portada (dentro de la carpeta de fotos). Vacío = usa fotos de prendas
-  fotoPortada: "portada.jpeg",
-  fotoPortada2: "portada2.jpg",
   envioGratisDesde: 150000,      // se reemplaza por el valor de la hoja «Envios»
   envioGratisAplicaA: "todo",    // "todo" o "sucursal"
   enviosCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRebpf8r6xx1xze75vMvfPWE9ZJBPWxXCL1ftLltYOlZ_1yOVEn9CN7W5znIel-IAu4BtnHLvBMiZEx/pub?gid=1311061001&single=true&output=csv",
@@ -978,11 +1097,6 @@ function renderStatic(){
   // chips
   $("#chips").innerHTML=["Todos",...CATEGORIAS.Ropa,"Calzado","Accesorios","Papelería"].map(c=>`<button class="chip" data-chip="${c}">${c}</button>`).join("");
 
-  // hero
-  const destacados=[...PRODUCTS.filter(p=>p.nuevo&&!p.encargo),...PRODUCTS.filter(p=>!p.nuevo&&!p.encargo),...PRODUCTS];
-  const h1=PRODUCTS.find(p=>p.id==="J01")||destacados[0], h2=PRODUCTS.find(p=>p.id==="C01")||destacados[1]||destacados[0];
-  if(h1)
-  $("#heroCollage").innerHTML=`<figure class="hc1"><img src="${CONFIG.fotoPortada&&CONFIG.sheetCsvUrl?photoUrl(CONFIG.fotoPortada):h1.fotos[0]}" alt="Trendy"></figure><figure class="hc2"><img src="${CONFIG.fotoPortada2&&CONFIG.sheetCsvUrl?photoUrl(CONFIG.fotoPortada2):(CONFIG.fotoPortada&&CONFIG.sheetCsvUrl?h1:h2).fotos[0]}" alt=""></figure><div class="hero-badge">Nuevos ingresos</div>`;
 
 }
 const ORDEN_TALLES=["XS","S","M","L","XL","XXL","Único"];
