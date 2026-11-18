@@ -860,7 +860,8 @@ const CONFIG = {
   envioGratisDesde: 150000,      // se reemplaza por el valor de la hoja «Envios»
   envioGratisAplicaA: "todo",    // "todo" o "sucursal"
   enviosCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRebpf8r6xx1xze75vMvfPWE9ZJBPWxXCL1ftLltYOlZ_1yOVEn9CN7W5znIel-IAu4BtnHLvBMiZEx/pub?gid=1311061001&single=true&output=csv",
-  mpApiUrl: "",                  // link del programa de Google (Apps Script) que conecta con Mercado Pago
+  mpApiUrl: "https://script.google.com/macros/s/AKfycbyDMtnc6VHHhRsUCfzqzZnTuVL_KGyjutRLszcfizx_SbGbCKyuChDS33uv579rMhE-/exec", // programa de Google (Apps Script) que conecta con Mercado Pago
+  mpSoloPrueba: true,            // true: el botón de Mercado Pago solo aparece entrando con ?mp=prueba (credenciales de prueba)
   descuentoTransferencia: 10,    // % de descuento pagando por transferencia (se reemplaza por la hoja «Envios»)
   direccionMapa: "Rivadavia 219, Clorinda, Formosa, Argentina"
 };
@@ -1462,6 +1463,10 @@ function updateOrderLink(lines=cartLines(),total,subtotal,cu,q){
     $("#sendFine").textContent="Se abre WhatsApp con tu pedido listo. Ahí confirmamos disponibilidad, envío y pago.";}
 }
 /* ---------- Mercado Pago ---------- */
+(function(){try{
+  if(new URLSearchParams(location.search).get("mp")==="prueba") sessionStorage.setItem("trendy_mp_prueba","1");
+  if(CONFIG.mpSoloPrueba&&sessionStorage.getItem("trendy_mp_prueba")!=="1") CONFIG.mpApiUrl="";
+}catch(e){if(CONFIG.mpSoloPrueba)CONFIG.mpApiUrl=""}})();
 async function pagarConMP(){
   const a=$("#sendOrder"); if(a.getAttribute("aria-busy")==="true") return;
   const v=id=>$("#"+id).value.trim(), modo=getModo();
