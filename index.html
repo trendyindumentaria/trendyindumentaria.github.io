@@ -995,6 +995,12 @@ const COLORES={negro:"#1C1C1C",blanco:"#FFFFFF",crudo:"#EDE6D6",natural:"#EDE6D6
   blanca:"#FFFFFF",negra:"#1C1C1C",dorada:"#C9A44C",plateada:"#C0C0C0",roja:"#B3261E",amarilla:"#E8C547",crema:"#F2E8D0",champagne:"#E6D2B5",caramelo:"#B7743A",tostado:"#A87A4F",tiza:"#F1EEE6"};
 function colorHex(name){const n=String(name||"");const h=n.match(/#[0-9a-f]{6}\b/i);if(h)return h[0];
   const k=n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");let best=null;for(const w in COLORES){if(k.includes(w)&&(!best||w.length>best.length))best=w}return best?COLORES[best]:"#CDB79E"}
+function colorMatch(t){const k=String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");let best=null;for(const w in COLORES){if(k.includes(w)&&(!best||w.length>best.length))best=w}return best?COLORES[best]:null}
+function colorFill(name){const n=String(name||"");const h=n.match(/#[0-9a-f]{6}\b/i);if(h)return h[0];
+  const cs=[];for(const parte of n.split(/\s+y\s+|\s+con\s+|\s+e\s+|[\/,+&-]/i)){const c=colorMatch(parte);if(c&&!cs.includes(c))cs.push(c)}
+  if(cs.length>=3)return `conic-gradient(${cs[0]} 0 33.3%,${cs[1]} 0 66.6%,${cs[2]} 0)`;
+  if(cs.length===2)return `linear-gradient(135deg,${cs[0]} 50%,${cs[1]} 50%)`;
+  return colorHex(n)}
 const colorLabel=n=>String(n||"").replace(/#[0-9a-f]{6}\b/i,"").trim();
 const sizeOf=k=>String(k).includes("|")?String(k).split("|")[1]:String(k);
 const colorOf=k=>String(k).includes("|")?String(k).split("|")[0]:"";
@@ -1021,7 +1027,7 @@ function normalize(list){
     let fotos=String(p.fotos||"").split(/[,|;\n]/).map(s=>s.trim()).filter(Boolean).map(f=>photoUrl(f,p.categoria));
     if(!fotos.length) fotos=[0,1,2].map(v=>fakePhoto(normSub(p.subcategoria)||p.categoria,p.tono||(color?colorHex(p.color):"#CDB79E"),v));
     const caract=String(p.caracteristicas||"").split(";").map(s=>s.split(":")).filter(a=>a[0]&&a[0].trim()).map(a=>[a[0].trim(),(a.slice(1).join(":")||"").trim()]);
-    return {...p,id:String(p.id||"").trim(),color,colorHex:colorHex(p.color),categoria:String(p.categoria||"").trim(),subcategoria:normSub(p.subcategoria),precio:precioN,talles,stock,sinTalle,encargo,fotos,caract,nuevo:String(p.nuevo||"").trim().toLowerCase()==="si",orden:i};
+    return {...p,id:String(p.id||"").trim(),color,colorHex:colorFill(p.color),categoria:String(p.categoria||"").trim(),subcategoria:normSub(p.subcategoria),precio:precioN,talles,stock,sinTalle,encargo,fotos,caract,nuevo:String(p.nuevo||"").trim().toLowerCase()==="si",orden:i};
   }).filter(p=>p.talles.length);
   // juntar las filas del mismo producto en distintos colores
   const out=[],byName={};
@@ -1101,9 +1107,9 @@ function renderStatic(){
   ["#igTop","#igBtn","#footIg"].forEach(s=>$(s).href=ig);
   $("#footIg").textContent="@"+CONFIG.instagram;
   $("#igHandle").textContent="@"+CONFIG.instagram;
-  const hola=waLink("¡Hola Trendy! Quería hacer una consulta 😊");
+  const hola=waLink("¡Hola Trendy! Quería hacer una consulta");
   ["#waBtn","#waFloat","#footWa"].forEach(s=>$(s).href=hola);
-  ENC_FOTO=waLink("¡Hola Trendy! 👋🏻 Quería consultar si pueden conseguir esta prenda (te mando la foto):");
+  ENC_FOTO=waLink("¡Hola Trendy! Quería consultar si pueden conseguir esta prenda (te mando la foto):");
   $("#footWa").textContent="WhatsApp "+CONFIG.whatsappVisible;
   $("#year").textContent=new Date().getFullYear();
   $("#mapBtn").href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(CONFIG.direccionMapa);
@@ -1236,7 +1242,7 @@ function updateEncargo(){
   if(!cur||!cur.encargo) return;
   const a=$("#encargoBtn"), ok=!!curSize;
   a.setAttribute("aria-disabled",ok?"false":"true");
-  a.href=ok?waLink(`¡Hola Trendy! 👋🏻 Quiero encargar:\n\n• ${cur.nombre} — ${varTxt(cur,curSize," — ")||"-"} — ${money(cur.precio)}\n\n¿Cómo coordinamos la seña? ¡Gracias!`):"#";
+  a.href=ok?waLink(`¡Hola Trendy! Quiero encargar:\n\n• ${cur.nombre} — ${varTxt(cur,curSize," — ")||"-"} — ${money(cur.precio)}\n\n¿Cómo coordinamos la seña? ¡Gracias!`):"#";
 }
 function setImg(i){
   curImg=(i+curFotos.length)%curFotos.length;
@@ -1429,7 +1435,7 @@ function updateOrderLink(lines=cartLines(),total,subtotal,cu,q){
   const v=id=>$("#"+id).value.trim(), modo=getModo(), name=v("fName");
   const pay=v("fPay"), dT=descTransferencia(total);
   const o=q[modo], envio=modo==="ret"?0:modo==="cpy"?(q.llega?0:null):(o?o.final:null);
-  let t="¡Hola Trendy! 👋🏻 Quiero hacer este pedido:\n\n";
+  let t="¡Hola Trendy! Quiero hacer este pedido:\n\n";
   t+=lines.map(c=>`• ${c.p.nombre}${varTxt(c.p,c.size)?" — "+varTxt(c.p,c.size," — "):""} × ${c.qty} — ${money(c.qty*c.p.precio)}`).join("\n");
   t+=`\n\nSubtotal: ${money(subtotal)}`;
   if(cu&&cu.monto>0) t+=`\nCupón ${cu.cupon.codigo} (${cu.cupon.pct?cu.cupon.valor+"%":money(cu.cupon.valor)} off): −${money(cu.monto)}`;
@@ -1490,7 +1496,7 @@ async function pagarConMP(){
 }
 function mostrarResultadoPago(ico,tit,txt,pedido){
   $("#payResIco").textContent=ico;$("#payResTit").textContent=tit;$("#payResTxt").textContent=txt;
-  $("#payResWa").href=waLink(`¡Hola Trendy! 👋🏻 Hice el pedido ${pedido} desde la web y lo pagué con Mercado Pago.`);
+  $("#payResWa").href=waLink(`¡Hola Trendy! Hice el pedido ${pedido} desde la web y lo pagué con Mercado Pago.`);
   $("#payRes").classList.add("on");
 }
 async function revisarRetornoPago(){
