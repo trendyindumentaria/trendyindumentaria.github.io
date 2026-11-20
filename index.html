@@ -1337,11 +1337,21 @@ function parseEnvios(text){
   if("descuento_transferencia" in cfg) CONFIG.descuentoTransferencia=parseFloat(String(cfg.descuento_transferencia).replace(",","."))||0;
   return {tarifas,provincias};
 }
+function copiarTexto(t){
+  // Copia síncrona (funciona en iPhone, Android y navegadores internos de Instagram/WhatsApp) + API moderna como respaldo
+  let ok=false;
+  try{const ta=document.createElement("textarea");ta.value=t;ta.setAttribute("readonly","");
+    ta.style.cssText="position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px;border:0;padding:0";
+    document.body.appendChild(ta);ta.contentEditable="true";ta.readOnly=false;
+    const r=document.createRange();r.selectNodeContents(ta);const sel=window.getSelection();sel.removeAllRanges();sel.addRange(r);
+    ta.setSelectionRange(0,t.length);ok=document.execCommand("copy");ta.blur();sel.removeAllRanges();document.body.removeChild(ta)}catch(e){}
+  try{if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).catch(()=>{})}catch(e){}
+  return ok}
 function renderSello(){const el=$("#sello"),n=CONFIG.selloLanzamiento;if(!el)return;if(!(n>0)){el.classList.remove("on");return}
   $("#selloPct").textContent=(Math.round(n*10)/10)+"%";el.classList.add("on");
   const cod=CONFIG.selloCodigo;el.title=cod?`Usá el código ${cod}`:"";
   el.onclick=e=>{if(!cod)return;e.preventDefault();
-    try{navigator.clipboard.writeText(cod).catch(()=>{})}catch(_){}
+    copiarTexto(cod);
     if(!cuponCode)$("#cuponInput").value=cod;
     toast(`🎉 ${n}% OFF con el código ${cod} · ya lo copiamos, aplicalo en el carrito`);clearTimeout(tt);tt=setTimeout(()=>$("#toast").classList.remove("on"),5000);
     track("sello_click",{codigo:cod});
