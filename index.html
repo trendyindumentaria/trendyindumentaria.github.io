@@ -212,6 +212,9 @@ footer a:hover{color:#fff}
 .buy-row{display:flex;gap:10px;margin-bottom:14px}
 .buy-row .btn{flex:1}
 .hint{font-size:.8rem;color:#b0482f;min-height:1.2em;margin-bottom:6px}
+.sticky-buy{display:none}
+@keyframes tallePulso{0%,100%{border-color:var(--line)}35%{border-color:var(--ink);box-shadow:0 0 0 2px rgba(20,20,20,.12)}}
+.size-row.pulso .size-btn:not(.on){animation:tallePulso 1s ease 2}
 .ask{font-size:.85rem;color:var(--ink-2);text-decoration:underline;text-underline-offset:4px;align-self:flex-start;margin-top:4px}
 
 .drawer{position:fixed;top:0;right:0;height:100%;width:min(420px,100%);background:var(--bg);z-index:70;transform:translateX(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:var(--shadow);overflow-y:auto;overscroll-behavior:contain}
@@ -408,6 +411,13 @@ input::placeholder{color:#9b908a;opacity:1}
   .modal-box{grid-template-columns:1fr;max-height:94vh}
   .detail{padding:26px 20px 30px}
   .detail h2{font-size:1.6rem}
+  .sticky-buy{display:flex;position:sticky;bottom:0;grid-column:1/-1;align-items:center;gap:14px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--white);border-top:1px solid var(--line);box-shadow:0 -8px 20px rgba(20,20,20,.07);z-index:4;transition:transform .28s ease,opacity .28s ease}
+  .sticky-buy.oculta{transform:translateY(100%);opacity:0;pointer-events:none}
+  .sb-info{display:flex;flex-direction:column;min-width:0;line-height:1.2}
+  .sb-info b{font-family:var(--serif);font-weight:400;font-size:1.25rem}
+  .sb-info span{font-size:.76rem;color:var(--taupe);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sticky-buy .btn{flex:1;max-width:230px;margin-left:auto;padding-left:14px;padding-right:14px}
+  .sticky-buy .btn[aria-disabled="true"]{opacity:.4}
   .foot-grid{grid-template-columns:1fr}
   .local-grid{grid-template-columns:1fr;gap:34px}
   .enc-grid{grid-template-columns:1fr;gap:22px;text-align:center}
@@ -764,6 +774,10 @@ input::placeholder{color:#9b908a;opacity:1}
       </div>
       <div class="hint" id="hint"></div>
       <a class="ask" id="askBtn" target="_blank" rel="noopener">¿Tenés dudas? Consultanos por WhatsApp</a>
+    </div>
+    <div class="sticky-buy" id="stickyBuy">
+      <div class="sb-info"><b id="sbPrice"></b><span id="sbSub"></span></div>
+      <button type="button" class="btn btn-dark" id="sbBtn">Agregar al carrito</button>
     </div>
   </div>
 </div>
@@ -1233,6 +1247,8 @@ function openProduct(id){
   selectColor(curColor,true);
   track("view_item",{currency:"ARS",value:cur.precio,items:[gaItem(cur)]});
   $("#modal").classList.add("on");$("#overlay").classList.add("on");document.body.style.overflow="hidden";
+  $("#stickyBuy").classList.remove("oculta"); document.querySelector("#modal .modal-box").scrollTop=0;
+  updateSticky(); observarCompra();
 }
 function fotoDe(p,k){const v=p.colores.find(c=>c.nombre===colorOf(k));return (v&&v.fotos[0])||p.fotos[0]}
 function renderSizes(){
@@ -1266,6 +1282,35 @@ function updateQtyUI(){
   $("#qPlus").classList.toggle("max",curQty>=max);
   if(max===0){add.setAttribute("aria-disabled","true");$("#hint").textContent=`Ya agregaste al carrito todas las unidades disponibles${dt}.`}
   else{add.removeAttribute("aria-disabled");}
+}
+function updateSticky(){
+  if(!cur) return;
+  const b=$("#sbBtn"), hayTalles=Object.keys(cur.stock).some(k=>colorOf(k)===curColor);
+  $("#sbPrice").textContent=money(cur.precio);
+  const variante=curSize?varTxt(cur,curSize," · "):"";
+  $("#sbSub").textContent=curSize?(variante||"Listo para agregar"):(curColor&&cur.colores.length>1?curColor+" · elegí tu talle":"Elegí tu talle");
+  b.textContent=cur.encargo?"Encargar":"Agregar al carrito";
+  const agotado=!cur.encargo&&curSize&&disponible(cur,curSize)<=0;
+  if(agotado) b.setAttribute("aria-disabled","true"); else b.removeAttribute("aria-disabled");
+  b.dataset.falta=(!curSize&&hayTalles)?"1":"";
+}
+function stickyClick(){
+  if(!cur) return;
+  if($("#sbBtn").dataset.falta){
+    const row=$("#pSizes"); row.scrollIntoView({behavior:"smooth",block:"center"});
+    row.classList.remove("pulso"); void row.offsetWidth; row.classList.add("pulso");
+    $("#hint").textContent="Elegí un talle para continuar."; return}
+  if(cur.encargo){const a=$("#encargoBtn"); if(a.getAttribute("aria-disabled")!=="true") window.open(a.href,"_blank","noopener"); return}
+  addToCart();
+}
+let sbObs=null;
+function observarCompra(){
+  const sb=$("#stickyBuy"), box=document.querySelector("#modal .modal-box");
+  if(!("IntersectionObserver" in window)||!sb||!box) return;
+  if(sbObs) sbObs.disconnect();
+  const vis=new Set();
+  sbObs=new IntersectionObserver(es=>{es.forEach(e=>e.isIntersecting?vis.add(e.target):vis.delete(e.target));sb.classList.toggle("oculta",vis.size>0)},{root:box,threshold:.6});
+  ["#addBtn","#encargoBtn"].forEach(q=>{const el=$(q); if(el) sbObs.observe(el)});
 }
 function updateEncargo(){
   if(!cur||!cur.encargo) return;
@@ -1612,8 +1657,8 @@ document.addEventListener("click",e=>{
   if(t.dataset.cat){e.preventDefault();goCat(t.dataset.cat)}
   else if(t.dataset.chip){state.cat=t.dataset.chip;renderGrid()}
   else if(t.classList.contains("card")) openProduct(t.dataset.id);
-  else if(t.dataset.color!==undefined&&t.classList.contains("color-btn")){selectColor(t.dataset.color);updateEncargo()}
-  else if(t.dataset.size){curSize=t.dataset.size;document.querySelectorAll(".size-btn").forEach(b=>b.classList.toggle("on",b===t));$("#hint").textContent="";updateQtyUI();updateAsk()}
+  else if(t.dataset.color!==undefined&&t.classList.contains("color-btn")){selectColor(t.dataset.color);updateEncargo();updateSticky()}
+  else if(t.dataset.size){curSize=t.dataset.size;document.querySelectorAll(".size-btn").forEach(b=>b.classList.toggle("on",b===t));$("#hint").textContent="";$("#pSizes").classList.remove("pulso");updateQtyUI();updateAsk();updateSticky()}
   else if(t.dataset.img) setImg(+t.dataset.img);
   else if(t.dataset.inc) changeQty(t.dataset.inc,1);
   else if(t.dataset.dec) changeQty(t.dataset.dec,-1);
@@ -1659,6 +1704,7 @@ $("#qPlus").onclick=()=>{
   if(curQty>=max){$("#hint").textContent=max===1?`Hay una sola unidad${dt}.`:`Solo hay ${max} unidades disponibles${dt}.`;return}
   curQty++;updateQtyUI()};
 $("#addBtn").onclick=addToCart;
+$("#sbBtn").onclick=stickyClick;
 $("#modalClose").onclick=closeAll;
 $("#overlay").onclick=closeAll;
 $("#modal").addEventListener("click",e=>{if(e.target.id==="modal")closeAll()});
