@@ -215,6 +215,11 @@ footer a:hover{color:#fff}
 .sticky-buy{display:none}
 @keyframes tallePulso{0%,100%{border-color:var(--line)}35%{border-color:var(--ink);box-shadow:0 0 0 2px rgba(20,20,20,.12)}}
 .size-row.pulso .size-btn:not(.on){animation:tallePulso 1s ease 2}
+.p-links{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;margin-top:4px}
+.share-btn{display:inline-flex;align-items:center;gap:8px;background:none;border:0;padding:8px 0;font:inherit;font-size:.85rem;color:var(--ink-2);cursor:pointer}
+.share-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.share-btn:hover{color:var(--ink)}
+.share-btn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .ask{font-size:.85rem;color:var(--ink-2);text-decoration:underline;text-underline-offset:4px;align-self:flex-start;margin-top:4px}
 
 .drawer{position:fixed;top:0;right:0;height:100%;width:min(420px,100%);background:var(--bg);z-index:70;transform:translateX(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:var(--shadow);overflow-y:auto;overscroll-behavior:contain}
@@ -773,7 +778,10 @@ input::placeholder{color:#9b908a;opacity:1}
         <a class="btn btn-dark" id="encargoBtn" target="_blank" rel="noopener" aria-disabled="true">Encargar por WhatsApp</a>
       </div>
       <div class="hint" id="hint"></div>
-      <a class="ask" id="askBtn" target="_blank" rel="noopener">¿Tenés dudas? Consultanos por WhatsApp</a>
+      <div class="p-links">
+        <a class="ask" id="askBtn" target="_blank" rel="noopener">¿Tenés dudas? Consultanos por WhatsApp</a>
+        <button type="button" class="share-btn" id="shareBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Compartir esta prenda</button>
+      </div>
     </div>
     <div class="sticky-buy" id="stickyBuy">
       <div class="sb-info"><b id="sbPrice"></b><span id="sbSub"></span></div>
@@ -1248,7 +1256,26 @@ function openProduct(id){
   track("view_item",{currency:"ARS",value:cur.precio,items:[gaItem(cur)]});
   $("#modal").classList.add("on");$("#overlay").classList.add("on");document.body.style.overflow="hidden";
   $("#stickyBuy").classList.remove("oculta"); document.querySelector("#modal .modal-box").scrollTop=0;
-  updateSticky(); observarCompra();
+  updateSticky(); observarCompra(); marcarUrl();
+}
+function linkPrenda(){
+  const u=new URL(location.origin+location.pathname);
+  if(cur){u.searchParams.set("p",cur.id); if(cur.colores.length>1&&curColor) u.searchParams.set("c",slug(curColor))}
+  return u.toString()}
+function marcarUrl(){try{history.replaceState(null,"",cur&&$("#modal").classList.contains("on")?linkPrenda():location.pathname+location.hash)}catch(e){}}
+async function compartirPrenda(){
+  if(!cur) return; const url=linkPrenda();
+  const texto=`Mirá ${cur.nombre}${cur.colores.length>1&&curColor?" ("+curColor+")":""} en Trendy`;
+  track("share",{method:navigator.share?"nativo":"copiar",item_id:cur.id});
+  if(navigator.share&&/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){try{await navigator.share({title:cur.nombre+" · Trendy",text:texto,url});return}catch(e){if(e&&e.name==="AbortError")return}}
+  copiarTexto(url); toast("Link de la prenda copiado. Pegalo donde quieras.");
+}
+function abrirDesdeUrl(){
+  const u=new URLSearchParams(location.search), id=u.get("p"); if(!id) return;
+  const p=PRODUCTS.find(x=>x.id===id);
+  if(!p){history.replaceState(null,"",location.pathname);toast("Esa prenda ya no está disponible. Mirá el resto del catálogo.");const c=document.getElementById("catalogo");if(c)c.scrollIntoView();return}
+  openProduct(id);
+  const c=u.get("c"); if(c){const col=p.colores.find(x=>slug(x.nombre)===c); if(col){selectColor(col.nombre);updateEncargo();updateSticky();marcarUrl()}}
 }
 function fotoDe(p,k){const v=p.colores.find(c=>c.nombre===colorOf(k));return (v&&v.fotos[0])||p.fotos[0]}
 function renderSizes(){
@@ -1327,7 +1354,9 @@ function updateAsk(){
   $("#askBtn").href=waLink(`¡Hola Trendy! Quería consultar por: ${cur.nombre}${curSize&&varTxt(cur,curSize)?" ("+varTxt(cur,curSize,", ").toLowerCase()+")":curColor?" ("+curColor.toLowerCase()+")":""} — ${money(cur.precio)}`);
 }
 function closeAll(){
+  const habiaPrenda=$("#modal").classList.contains("on");
   $("#modal").classList.remove("on");$("#drawer").classList.remove("on");$("#overlay").classList.remove("on");document.body.style.overflow="";
+  if(habiaPrenda||new URLSearchParams(location.search).has("p")) marcarUrl();
 }
 
 /* ---------- Carrito ---------- */
@@ -1657,7 +1686,7 @@ document.addEventListener("click",e=>{
   if(t.dataset.cat){e.preventDefault();goCat(t.dataset.cat)}
   else if(t.dataset.chip){state.cat=t.dataset.chip;renderGrid()}
   else if(t.classList.contains("card")) openProduct(t.dataset.id);
-  else if(t.dataset.color!==undefined&&t.classList.contains("color-btn")){selectColor(t.dataset.color);updateEncargo();updateSticky()}
+  else if(t.dataset.color!==undefined&&t.classList.contains("color-btn")){selectColor(t.dataset.color);updateEncargo();updateSticky();marcarUrl()}
   else if(t.dataset.size){curSize=t.dataset.size;document.querySelectorAll(".size-btn").forEach(b=>b.classList.toggle("on",b===t));$("#hint").textContent="";$("#pSizes").classList.remove("pulso");updateQtyUI();updateAsk();updateSticky()}
   else if(t.dataset.img) setImg(+t.dataset.img);
   else if(t.dataset.inc) changeQty(t.dataset.inc,1);
@@ -1705,6 +1734,7 @@ $("#qPlus").onclick=()=>{
   curQty++;updateQtyUI()};
 $("#addBtn").onclick=addToCart;
 $("#sbBtn").onclick=stickyClick;
+$("#shareBtn").onclick=compartirPrenda;
 $("#modalClose").onclick=closeAll;
 $("#overlay").onclick=closeAll;
 $("#modal").addEventListener("click",e=>{if(e.target.id==="modal")closeAll()});
@@ -1730,7 +1760,7 @@ window.addEventListener("scroll",()=>$("header.site").classList.toggle("compact"
 g.addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40)setImg(curImg+(dx<0?1:-1));x0=null})})();
 
 initProvincias();loadForm();renderGratisTextos();
-(async()=>{[PRODUCTS,CUPONES,ENVIOS]=await Promise.all([loadProducts(),loadCupones(),loadEnvios()]);initProvincias();loadForm();renderGratisTextos();renderSello();renderStatic();renderGrid();renderCart();revisarRetornoPago()})();
+(async()=>{[PRODUCTS,CUPONES,ENVIOS]=await Promise.all([loadProducts(),loadCupones(),loadEnvios()]);initProvincias();loadForm();renderGratisTextos();renderSello();renderStatic();renderGrid();renderCart();revisarRetornoPago();abrirDesdeUrl()})();
 </script>
 </body>
 </html>
