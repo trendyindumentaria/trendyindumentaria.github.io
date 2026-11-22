@@ -1639,12 +1639,19 @@ async function revisarRetornoPago(){
   const u=new URLSearchParams(location.search), pago=u.get("pago"), pedido=u.get("pedido");
   if(!pago||!pedido) return;
   history.replaceState(null,"",location.pathname+location.hash);
-  let estado=pago==="ok"?"pagado":pago==="pendiente"?"pendiente":"rechazado";
-  if(CONFIG.mpApiUrl){try{const r=await fetch(CONFIG.mpApiUrl+"?accion=estado&pedido="+encodeURIComponent(pedido));const d=await r.json();if(d.ok&&d.estado&&d.estado!=="creado")estado=d.estado}catch(e){}}
+  // El estado SIEMPRE se confirma con Mercado Pago (a través del script); el parámetro de la URL solo sirve de pista.
+  let estado=pago==="ok"||pago==="pendiente"?"verificando":"rechazado", tot=0;
+  if(CONFIG.mpApiUrl){try{const r=await fetch(CONFIG.mpApiUrl+"?accion=estado&pedido="+encodeURIComponent(pedido));const d=await r.json();
+    if(d.ok&&d.estado){estado=d.estado==="creado"?(pago==="error"?"rechazado":"verificando"):d.estado;tot=Number(d.total)||0}}catch(e){}}
+  if(estado==="verificando"){
+    mostrarResultadoPago("⏳","Estamos confirmando tu pago",`Tu pedido es el ${pedido}. Mercado Pago todavía no nos confirmó el pago: en cuanto se acredite te escribimos por WhatsApp. Si ya pagaste, no hace falta que vuelvas a pagar.`,pedido);
+    return;
+  }
   if(estado==="pagado"||estado==="pendiente"){
-    let tot=0;try{tot=(JSON.parse(localStorage.getItem("trendy_mp")||"{}").total)||0}catch(e){}
     cart=[];saveCart();cuponCode="";try{localStorage.removeItem("trendy_cupon")}catch(e){}renderCart();
-    if(estado==="pagado"){track("purchase",{transaction_id:pedido,value:tot,currency:"ARS"});
+    if(estado==="pagado"){
+      let ya=[];try{ya=JSON.parse(localStorage.getItem("trendy_compras")||"[]")}catch(e){}
+      if(!ya.includes(pedido)){track("purchase",{transaction_id:pedido,value:tot,currency:"ARS"});try{localStorage.setItem("trendy_compras",JSON.stringify(ya.concat(pedido).slice(-20)))}catch(e){}}
       mostrarResultadoPago("🎉","¡Gracias por tu compra!",`Tu pago fue aprobado. Tu número de pedido es ${pedido}. Te escribimos por WhatsApp para coordinar la entrega.`,pedido);}
     else mostrarResultadoPago("⏳","Tu pago está pendiente",`Registramos tu pedido ${pedido}. Cuando se acredite el pago (si elegiste efectivo, al pagar en Rapipago o Pago Fácil) lo preparamos y te avisamos.`,pedido);
   }else{
