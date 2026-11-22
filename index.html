@@ -361,6 +361,9 @@ input::placeholder{color:#9b908a;opacity:1}
 .color-btn.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 
 /* ---------- A pedido ---------- */
+.badge.off{left:auto;right:12px;background:linear-gradient(180deg,#F3DFA8,#D9B56C);color:#2E2108;font-weight:500;letter-spacing:.08em}
+.p-lista{color:var(--taupe);font-size:.78em;margin-right:4px;text-decoration-thickness:1px}
+.p-off{display:inline-block;vertical-align:middle;margin-left:10px;font-family:var(--sans);font-size:.72rem;font-weight:500;letter-spacing:.06em;padding:3px 8px;background:linear-gradient(180deg,#F3DFA8,#D9B56C);color:#2E2108}
 .badge.pedido{background:#DAD0C7;color:#3B332C}
 .encargos{background:#F6F1EC;border-top:1px solid var(--line);padding:64px 0}
 .enc-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:40px;align-items:center}
@@ -911,6 +914,8 @@ const CONFIG = {
   enviosCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRebpf8r6xx1xze75vMvfPWE9ZJBPWxXCL1ftLltYOlZ_1yOVEn9CN7W5znIel-IAu4BtnHLvBMiZEx/pub?gid=1311061001&single=true&output=csv",
   mpApiUrl: "https://script.google.com/macros/s/AKfycbyDMtnc6VHHhRsUCfzqzZnTuVL_KGyjutRLszcfizx_SbGbCKyuChDS33uv579rMhE-/exec", // programa de Google (Apps Script) que conecta con Mercado Pago
   mpSoloPrueba: false,           // true: el botón de Mercado Pago solo aparece entrando con ?mp=prueba (credenciales de prueba)
+  descuentoGeneral: 0,          // % de rebaja directa sobre los precios (0 = sin rebaja). Clave descuento_general en «Envios»
+  descuentoExcluye: ["Calzado"], // categorías sin rebaja. Clave descuento_excluye en «Envios» (separadas por coma)
   selloLanzamiento: 20,
   selloCodigo: "BIENVENIDA20",   // código que muestra/copia el sello al tocarlo (clave sello_codigo en «Envios»)          // % que muestra el sello dorado fijo (0 = oculto). Se reemplaza por la hoja «Envios», clave sello_lanzamiento
   descuentoTransferencia: 10,    // % de descuento pagando por transferencia (se reemplaza por la hoja «Envios»)
@@ -1228,10 +1233,10 @@ function renderGrid(){
   $("#resultInfo").textContent=(state.q?`Resultados para «${state.q}» · `:"")+list.length+(list.length===1?" producto":" productos");
   $("#grid").innerHTML=list.length?list.map(p=>{
     const units=Object.values(p.stock).reduce((a,n)=>a+n,0);
-    const last=p.encargo?'<span class="badge pedido">A pedido</span>':p.nuevo?'<span class="badge">Nuevo</span>':"";
+    const last=(p.encargo?'<span class="badge pedido">A pedido</span>':p.nuevo?'<span class="badge">Nuevo</span>':"")+(p.precioLista?`<span class="badge off">−${CONFIG.descuentoGeneral}%</span>`:"");
     return `<button class="card" data-id="${esc(p.id)}">
       <div class="ph">${last}<img src="${p.fotos[0]}" alt="${esc(p.nombre)}" loading="lazy">${p.fotos[1]?`<img class="alt" src="${p.fotos[1]}" alt="" loading="lazy">`:""}<span class="quick">${p.encargo?"Encargar":"Ver detalle"}</span></div>
-      <h3>${esc(p.nombre)}</h3>${p.colores.length>1?`<div class="swatches">${p.colores.slice(0,6).map(c=>`<i style="background:${c.hex}" title="${esc(c.nombre)}"></i>`).join("")}${p.colores.length>6?`<small>+${p.colores.length-6}</small>`:""}</div>`:""}<div class="price">${money(p.precio)}</div><div class="sizes">${p.encargo?`A pedido · Talles ${esc(rangoTalles(p.talles))}`:p.sinTalle?"Disponible":"Talles: "+p.talles.map(esc).join(" · ")}</div>
+      <h3>${esc(p.nombre)}</h3>${p.colores.length>1?`<div class="swatches">${p.colores.slice(0,6).map(c=>`<i style="background:${c.hex}" title="${esc(c.nombre)}"></i>`).join("")}${p.colores.length>6?`<small>+${p.colores.length-6}</small>`:""}</div>`:""}<div class="price">${precioHTML(p)}</div><div class="sizes">${p.encargo?`A pedido · Talles ${esc(rangoTalles(p.talles))}`:p.sinTalle?"Disponible":"Talles: "+p.talles.map(esc).join(" · ")}</div>
     </button>`}).join(""):(LOAD_ERROR?`<div class="empty" style="grid-column:1/-1">No pudimos cargar el catálogo. Probá recargar la página en unos minutos o escribinos por WhatsApp.</div>`:!PRODUCTS.length?`<div class="empty" style="grid-column:1/-1">Estamos cargando nuevas prendas. ¡Volvé pronto!</div>`:(`<div class="empty" style="grid-column:1/-1">No encontramos prendas con esos filtros.<br><br><button class="btn btn-light" id="resetF">Ver todo</button></div>`));
 }
 
@@ -1245,7 +1250,7 @@ function openProduct(id){
   $("#buyBox").style.display=cur.encargo?"none":"";
   $("#encargoBox").style.display=cur.encargo?"":"none";
   $("#pName").textContent=cur.nombre;
-  $("#pPrice").innerHTML=money(cur.precio)+(CONFIG.descuentoTransferencia>0?`<small class="price-trans">${money(Math.round(cur.precio*(100-CONFIG.descuentoTransferencia)/100))} pagando por transferencia</small>`:"");
+  $("#pPrice").innerHTML=precioHTML(cur)+(cur.precioLista?`<span class="p-off">−${CONFIG.descuentoGeneral}%</span>`:"")+(CONFIG.descuentoTransferencia>0?`<small class="price-trans">${money(Math.round(cur.precio*(100-CONFIG.descuentoTransferencia)/100))} pagando por transferencia</small>`:"");
   $("#pDesc").textContent=cur.descripcion||"";
   $("#pFeat").innerHTML=cur.caract.map(([k,v])=>`<li><b>${esc(k)}</b>${esc(v)}</li>`).join("");
   $("#pFeat").style.display=cur.caract.length?"":"none";
@@ -1258,6 +1263,11 @@ function openProduct(id){
   $("#stickyBuy").classList.remove("oculta"); document.querySelector("#modal .modal-box").scrollTop=0;
   updateSticky(); observarCompra(); marcarUrl();
 }
+function aplicaDescuento(p){const ex=CONFIG.descuentoExcluye.map(x=>slug(x));return CONFIG.descuentoGeneral>0&&!ex.includes(slug(p.categoria))&&!ex.includes(slug(p.subcategoria))}
+function aplicarDescuentoGeneral(){
+  // Mismo cálculo que el script de Mercado Pago (aplicarDescuento_ en Codigo.gs)
+  PRODUCTS.forEach(p=>{if(aplicaDescuento(p)&&p.precio>0){p.precioLista=p.precio;p.precio=Math.round(p.precio*(100-CONFIG.descuentoGeneral)/100)}})}
+function precioHTML(p){return p.precioLista?`<s class="p-lista">${money(p.precioLista)}</s> ${money(p.precio)}`:money(p.precio)}
 function linkPrenda(){
   const u=new URL(location.origin+location.pathname);
   if(cur){u.searchParams.set("p",cur.id); if(cur.colores.length>1&&curColor) u.searchParams.set("c",slug(curColor))}
@@ -1406,6 +1416,8 @@ function parseEnvios(text){
   if(!Object.keys(tarifas).length||!Object.keys(provincias).length) throw 0;
   if("envio_gratis_desde" in cfg) CONFIG.envioGratisDesde=parsePrice(cfg.envio_gratis_desde);
   if(cfg.envio_gratis_aplica_a) CONFIG.envioGratisAplicaA=/suc/i.test(cfg.envio_gratis_aplica_a)?"sucursal":"todo";
+  if("descuento_general" in cfg) CONFIG.descuentoGeneral=Math.min(90,Math.max(0,parseFloat(String(cfg.descuento_general).replace(",","."))||0));
+  if("descuento_excluye" in cfg) CONFIG.descuentoExcluye=String(cfg.descuento_excluye).split(",").map(x=>x.trim()).filter(Boolean);
   if("sello_codigo" in cfg) CONFIG.selloCodigo=String(cfg.sello_codigo).trim().toUpperCase();
   if("sello_lanzamiento" in cfg) CONFIG.selloLanzamiento=parseFloat(String(cfg.sello_lanzamiento).replace(",","."))||0;
   if("descuento_transferencia" in cfg) CONFIG.descuentoTransferencia=parseFloat(String(cfg.descuento_transferencia).replace(",","."))||0;
@@ -1760,7 +1772,7 @@ window.addEventListener("scroll",()=>$("header.site").classList.toggle("compact"
 g.addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40)setImg(curImg+(dx<0?1:-1));x0=null})})();
 
 initProvincias();loadForm();renderGratisTextos();
-(async()=>{[PRODUCTS,CUPONES,ENVIOS]=await Promise.all([loadProducts(),loadCupones(),loadEnvios()]);initProvincias();loadForm();renderGratisTextos();renderSello();renderStatic();renderGrid();renderCart();revisarRetornoPago();abrirDesdeUrl()})();
+(async()=>{[PRODUCTS,CUPONES,ENVIOS]=await Promise.all([loadProducts(),loadCupones(),loadEnvios()]);aplicarDescuentoGeneral();initProvincias();loadForm();renderGratisTextos();renderSello();renderStatic();renderGrid();renderCart();revisarRetornoPago();abrirDesdeUrl()})();
 </script>
 </body>
 </html>
